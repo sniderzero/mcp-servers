@@ -1,0 +1,719 @@
+[
+  {
+    "id": "sp-list-my-drives",
+    "description": "List all drives (OneDrive) available to the current user",
+    "examples": [
+      "List my drives",
+      "What OneDrive drives do I have?",
+      "Show my available drives"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drives",
+    "method": "GET",
+    "scopes": ["Files.Read", "Files.Read.All"],
+    "tags": ["sharepoint", "onedrive", "drives", "list"]
+  },
+  {
+    "id": "sp-get-my-default-drive",
+    "description": "Get the current user's default OneDrive",
+    "examples": [
+      "Open my OneDrive",
+      "Get my default drive",
+      "Show my OneDrive root"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive",
+    "method": "GET",
+    "scopes": ["Files.Read"],
+    "tags": ["sharepoint", "onedrive", "drives", "get", "default"]
+  },
+  {
+    "id": "sp-list-site-drives",
+    "description": "List all document libraries (drives) in a SharePoint site",
+    "examples": [
+      "What document libraries are in this site?",
+      "List drives for site X",
+      "Show SharePoint libraries"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/sites/{site-id}/drives",
+    "method": "GET",
+    "scopes": ["Files.Read.All", "Sites.Read.All"],
+    "tags": ["sharepoint", "drives", "list", "site"]
+  },
+  {
+    "id": "sp-get-drive",
+    "description": "Get a specific drive by its ID",
+    "examples": [
+      "Get drive details for drive X",
+      "Show info about this document library"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/drives/{drive-id}",
+    "method": "GET",
+    "scopes": ["Files.Read", "Files.Read.All"],
+    "tags": ["sharepoint", "drives", "get"]
+  },
+  {
+    "id": "sp-list-drive-root-items",
+    "description": "List items in the root of a drive",
+    "examples": [
+      "What files are in my OneDrive root?",
+      "List files in the top level of my drive",
+      "Show root folder contents"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/root/children",
+    "method": "GET",
+    "scopes": ["Files.Read"],
+    "query_params": {
+      "$select": "id,name,size,lastModifiedDateTime,folder,file",
+      "$top": 50
+    },
+    "tags": ["sharepoint", "onedrive", "files", "folders", "list", "root"]
+  },
+  {
+    "id": "sp-list-folder-items-by-id",
+    "description": "List items in a specific folder by folder ID",
+    "examples": [
+      "What's in folder X?",
+      "List files in this folder",
+      "Show folder contents"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/items/{item-id}/children",
+    "method": "GET",
+    "scopes": ["Files.Read"],
+    "query_params": {
+      "$select": "id,name,size,lastModifiedDateTime,folder,file",
+      "$top": 50
+    },
+    "tags": ["sharepoint", "onedrive", "files", "folders", "list"]
+  },
+  {
+    "id": "sp-list-folder-items-by-path",
+    "description": "List items in a folder specified by path",
+    "examples": [
+      "List files in /Documents/Projects",
+      "What's in my Documents folder?",
+      "Show files in path X"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/root:/{folder-path}:/children",
+    "method": "GET",
+    "scopes": ["Files.Read"],
+    "query_params": {
+      "$select": "id,name,size,lastModifiedDateTime,folder,file",
+      "$top": 50
+    },
+    "tags": ["sharepoint", "onedrive", "files", "folders", "list", "path"]
+  },
+  {
+    "id": "sp-get-item-by-id",
+    "description": "Get a file or folder by its item ID",
+    "examples": [
+      "Get file info for item X",
+      "Show details about this file",
+      "What is this item?"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/items/{item-id}",
+    "method": "GET",
+    "scopes": ["Files.Read"],
+    "tags": ["sharepoint", "onedrive", "files", "folders", "get"]
+  },
+  {
+    "id": "sp-get-item-by-path",
+    "description": "Get a file or folder by its path",
+    "examples": [
+      "Get the file at /Documents/report.docx",
+      "Show info for file at path X",
+      "Find the file at this path"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/root:/{item-path}",
+    "method": "GET",
+    "scopes": ["Files.Read"],
+    "tags": ["sharepoint", "onedrive", "files", "folders", "get", "path"]
+  },
+  {
+    "id": "sp-download-file-content",
+    "description": "Download the content of a file by its ID",
+    "examples": [
+      "Download file X",
+      "Get the contents of this file",
+      "Download the report"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/items/{item-id}/content",
+    "method": "GET",
+    "scopes": ["Files.Read"],
+    "notes": "File download returns a redirect to the download URL. Use getStream() for binary content.",
+    "tags": ["sharepoint", "onedrive", "files", "download", "content"]
+  },
+  {
+    "id": "sp-upload-small-file",
+    "description": "Upload a small file (under 4MB) to a specific folder",
+    "examples": [
+      "Upload a file to my OneDrive",
+      "Put this file in my Documents folder",
+      "Upload report.pdf to folder X"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/items/{parent-id}:/{filename}:/content",
+    "method": "PUT",
+    "scopes": ["Files.ReadWrite"],
+    "notes": "Upload via PUT /me/drive/items/{parent-id}:/{filename}:/content for files < 4MB. For larger files, use an upload session. Use @microsoft.graph.conflictBehavior header: rename, replace, or fail.",
+    "tags": ["sharepoint", "onedrive", "files", "upload", "create"]
+  },
+  {
+    "id": "sp-create-folder",
+    "description": "Create a new folder in a drive",
+    "examples": [
+      "Create a folder called 'Projects' in my OneDrive",
+      "Make a new folder in Documents",
+      "Add a subfolder"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/items/{parent-id}/children",
+    "method": "POST",
+    "scopes": ["Files.ReadWrite"],
+    "body_template": {
+      "name": "{{folderName}}",
+      "folder": {},
+      "@microsoft.graph.conflictBehavior": "rename"
+    },
+    "notes": "Use @microsoft.graph.conflictBehavior header: rename, replace, or fail.",
+    "tags": ["sharepoint", "onedrive", "folders", "create"]
+  },
+  {
+    "id": "sp-delete-item",
+    "description": "Delete a file or folder by its ID",
+    "examples": [
+      "Delete file X",
+      "Remove this folder",
+      "Trash the old report"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/items/{item-id}",
+    "method": "DELETE",
+    "scopes": ["Files.ReadWrite"],
+    "notes": "Deleted items are moved to the recycle bin and can be restored within the retention period.",
+    "tags": ["sharepoint", "onedrive", "files", "folders", "delete"]
+  },
+  {
+    "id": "sp-move-item",
+    "description": "Move a file or folder to a different location",
+    "examples": [
+      "Move file X to folder Y",
+      "Relocate this document to another folder",
+      "Move the report to the archive folder"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/items/{item-id}",
+    "method": "PATCH",
+    "scopes": ["Files.ReadWrite"],
+    "body_template": {
+      "parentReference": {
+        "id": "{{destinationFolderId}}"
+      }
+    },
+    "tags": ["sharepoint", "onedrive", "files", "folders", "move"]
+  },
+  {
+    "id": "sp-copy-item",
+    "description": "Copy a file or folder to a new location",
+    "examples": [
+      "Copy file X to folder Y",
+      "Duplicate this document",
+      "Make a copy of the template"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/items/{item-id}/copy",
+    "method": "POST",
+    "scopes": ["Files.ReadWrite"],
+    "body_template": {
+      "parentReference": {
+        "id": "{{destinationFolderId}}"
+      },
+      "name": "{{newName}}"
+    },
+    "notes": "Copy is an async operation. The response includes a Location header with a URL to monitor progress.",
+    "tags": ["sharepoint", "onedrive", "files", "folders", "copy"]
+  },
+  {
+    "id": "sp-rename-item",
+    "description": "Rename a file or folder",
+    "examples": [
+      "Rename file X to Y",
+      "Change the name of this folder",
+      "Rename the report"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/items/{item-id}",
+    "method": "PATCH",
+    "scopes": ["Files.ReadWrite"],
+    "body_template": {
+      "name": "{{newName}}"
+    },
+    "tags": ["sharepoint", "onedrive", "files", "folders", "rename", "update"]
+  },
+  {
+    "id": "sp-search-drive",
+    "description": "Search for files within a specific drive",
+    "examples": [
+      "Search for 'budget' in my OneDrive",
+      "Find files matching 'report' in this drive",
+      "Search my drive for spreadsheets"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/root/search(q='{search-query}')",
+    "method": "GET",
+    "scopes": ["Files.Read"],
+    "query_params": {
+      "$select": "id,name,size,lastModifiedDateTime,webUrl",
+      "$top": 25
+    },
+    "tags": ["sharepoint", "onedrive", "files", "search"]
+  },
+  {
+    "id": "sp-search-all-drives",
+    "description": "Search for files across all drives accessible to the user",
+    "examples": [
+      "Search everywhere for 'quarterly report'",
+      "Find files across all my drives",
+      "Global file search for 'presentation'"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/search(q='{search-query}')",
+    "method": "GET",
+    "scopes": ["Files.Read", "Files.Read.All"],
+    "query_params": {
+      "$select": "id,name,size,lastModifiedDateTime,webUrl,parentReference",
+      "$top": 25
+    },
+    "notes": "This searches across OneDrive and any SharePoint drives the user has access to.",
+    "tags": ["sharepoint", "onedrive", "files", "search", "global"]
+  },
+  {
+    "id": "sp-create-sharing-link",
+    "description": "Create a sharing link for a file or folder",
+    "examples": [
+      "Share file X with a link",
+      "Create a sharing link for this document",
+      "Generate a view-only link"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/items/{item-id}/createLink",
+    "method": "POST",
+    "scopes": ["Files.ReadWrite"],
+    "body_template": {
+      "type": "view",
+      "scope": "organization"
+    },
+    "notes": "type can be 'view', 'edit', or 'embed'. scope can be 'anonymous', 'organization', or 'users'.",
+    "tags": ["sharepoint", "onedrive", "files", "sharing", "link"]
+  },
+  {
+    "id": "sp-list-permissions",
+    "description": "List permissions set on a file or folder",
+    "examples": [
+      "Who has access to this file?",
+      "List permissions on file X",
+      "Show sharing settings for this document"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/items/{item-id}/permissions",
+    "method": "GET",
+    "scopes": ["Files.Read"],
+    "tags": ["sharepoint", "onedrive", "files", "permissions", "sharing", "list"]
+  },
+  {
+    "id": "sp-search-sites",
+    "description": "Search for SharePoint sites",
+    "examples": [
+      "Find SharePoint sites matching 'marketing'",
+      "Search for a site called 'HR Portal'",
+      "List SharePoint sites"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/sites",
+    "method": "GET",
+    "scopes": ["Sites.Read.All"],
+    "query_params": {
+      "search": "{{query}}"
+    },
+    "notes": "Site search: GET /sites?search={query}. Returns sites matching the query string.",
+    "tags": ["sharepoint", "sites", "search", "list"]
+  },
+  {
+    "id": "sp-get-site-by-id",
+    "description": "Get a SharePoint site by its site ID",
+    "examples": [
+      "Get site details for site X",
+      "Show info about this SharePoint site"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/sites/{site-id}",
+    "method": "GET",
+    "scopes": ["Sites.Read.All"],
+    "tags": ["sharepoint", "sites", "get"]
+  },
+  {
+    "id": "sp-get-root-site",
+    "description": "Get the root SharePoint site for the organization",
+    "examples": [
+      "Get the root SharePoint site",
+      "Show the main SharePoint site",
+      "What is the root site?"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/sites/root",
+    "method": "GET",
+    "scopes": ["Sites.Read.All"],
+    "tags": ["sharepoint", "sites", "get", "root"]
+  },
+  {
+    "id": "sp-get-site-by-url",
+    "description": "Get a SharePoint site by its URL path (hostname and relative path)",
+    "examples": [
+      "Get the site at contoso.sharepoint.com/sites/marketing",
+      "Find the SharePoint site by URL"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/sites/{hostname}:/{server-relative-path}",
+    "method": "GET",
+    "scopes": ["Sites.Read.All"],
+    "notes": "Format: /sites/{hostname}:/{server-relative-path} e.g. /sites/contoso.sharepoint.com:/sites/marketing",
+    "tags": ["sharepoint", "sites", "get", "url", "path"]
+  },
+  {
+    "id": "sp-list-subsites",
+    "description": "List subsites of a SharePoint site",
+    "examples": [
+      "What subsites does this site have?",
+      "List child sites",
+      "Show subsites of site X"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/sites/{site-id}/sites",
+    "method": "GET",
+    "scopes": ["Sites.Read.All"],
+    "tags": ["sharepoint", "sites", "list", "subsites"]
+  },
+  {
+    "id": "sp-list-site-lists",
+    "description": "List all SharePoint lists in a site",
+    "examples": [
+      "What lists are in this site?",
+      "Show SharePoint lists for site X",
+      "List all lists in the team site"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/sites/{site-id}/lists",
+    "method": "GET",
+    "scopes": ["Sites.Read.All"],
+    "query_params": {
+      "$select": "id,displayName,description,lastModifiedDateTime"
+    },
+    "tags": ["sharepoint", "sites", "lists", "list"]
+  },
+  {
+    "id": "sp-get-list",
+    "description": "Get a specific SharePoint list by its ID",
+    "examples": [
+      "Get list details for list X",
+      "Show info about this SharePoint list"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/sites/{site-id}/lists/{list-id}",
+    "method": "GET",
+    "scopes": ["Sites.Read.All"],
+    "tags": ["sharepoint", "sites", "lists", "get"]
+  },
+  {
+    "id": "sp-list-items",
+    "description": "List items in a SharePoint list with field expansion",
+    "examples": [
+      "Show items in list X",
+      "Get all entries in this SharePoint list",
+      "List tasks in the task list"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/sites/{site-id}/lists/{list-id}/items",
+    "method": "GET",
+    "scopes": ["Sites.Read.All"],
+    "query_params": {
+      "$expand": "fields",
+      "$top": 50
+    },
+    "notes": "List items must use $expand=fields to get custom column values. Without it, only system metadata is returned.",
+    "tags": ["sharepoint", "sites", "lists", "items", "list"]
+  },
+  {
+    "id": "sp-get-list-item",
+    "description": "Get a specific item from a SharePoint list",
+    "examples": [
+      "Get item X from list Y",
+      "Show details for this list entry"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/sites/{site-id}/lists/{list-id}/items/{item-id}",
+    "method": "GET",
+    "scopes": ["Sites.Read.All"],
+    "query_params": {
+      "$expand": "fields"
+    },
+    "notes": "List items must use $expand=fields to get custom column values.",
+    "tags": ["sharepoint", "sites", "lists", "items", "get"]
+  },
+  {
+    "id": "sp-create-list-item",
+    "description": "Create a new item in a SharePoint list",
+    "examples": [
+      "Add a new item to list X",
+      "Create a new entry in the task list",
+      "Add a row to the SharePoint list"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/sites/{site-id}/lists/{list-id}/items",
+    "method": "POST",
+    "scopes": ["Sites.ReadWrite.All"],
+    "body_template": {
+      "fields": {
+        "Title": "{{title}}"
+      }
+    },
+    "notes": "The fields object should contain key-value pairs matching the list's column internal names.",
+    "tags": ["sharepoint", "sites", "lists", "items", "create"]
+  },
+  {
+    "id": "sp-update-list-item",
+    "description": "Update an existing item in a SharePoint list",
+    "examples": [
+      "Update item X in list Y",
+      "Change the status of this list item",
+      "Edit a SharePoint list entry"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/sites/{site-id}/lists/{list-id}/items/{item-id}/fields",
+    "method": "PATCH",
+    "scopes": ["Sites.ReadWrite.All"],
+    "body_template": {
+      "Title": "{{newTitle}}"
+    },
+    "notes": "PATCH the /fields endpoint directly with the column values to update. Use internal column names.",
+    "tags": ["sharepoint", "sites", "lists", "items", "update"]
+  },
+  {
+    "id": "sp-delete-list-item",
+    "description": "Delete an item from a SharePoint list",
+    "examples": [
+      "Delete item X from list Y",
+      "Remove this entry from the list",
+      "Delete the completed task"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/sites/{site-id}/lists/{list-id}/items/{item-id}",
+    "method": "DELETE",
+    "scopes": ["Sites.ReadWrite.All"],
+    "tags": ["sharepoint", "sites", "lists", "items", "delete"]
+  },
+  {
+    "id": "sp-get-drive-item-thumbnails",
+    "description": "Get thumbnails for a file (images, PDFs, etc.)",
+    "examples": [
+      "Get a preview of this image",
+      "Show thumbnails for file X",
+      "Get a thumbnail of the document"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/items/{item-id}/thumbnails",
+    "method": "GET",
+    "scopes": ["Files.Read"],
+    "notes": "Returns small, medium, and large thumbnail sizes. Only available for file types that support previews (images, PDFs, Office docs).",
+    "tags": ["sharepoint", "onedrive", "files", "thumbnails", "preview"]
+  },
+  {
+    "id": "sp-get-file-preview",
+    "description": "Get an embeddable preview URL for a file",
+    "examples": [
+      "Get a preview link for this document",
+      "Show a preview of the spreadsheet",
+      "Generate an embed URL for this file"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/items/{item-id}/preview",
+    "method": "POST",
+    "scopes": ["Files.Read"],
+    "notes": "Returns getUrl and postUrl for embedding the file preview in an iframe.",
+    "tags": ["sharepoint", "onedrive", "files", "preview", "embed"]
+  },
+  {
+    "id": "sp-list-drive-recent",
+    "description": "List recently accessed files by the current user",
+    "examples": [
+      "Show my recent files",
+      "What files did I open recently?",
+      "List recently accessed documents"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/recent",
+    "method": "GET",
+    "scopes": ["Files.Read"],
+    "tags": ["sharepoint", "onedrive", "files", "recent", "list"]
+  },
+  {
+    "id": "sp-list-shared-with-me",
+    "description": "List files that have been shared with the current user",
+    "examples": [
+      "What files are shared with me?",
+      "Show files others shared with me",
+      "List my shared documents"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/sharedWithMe",
+    "method": "GET",
+    "scopes": ["Files.Read.All"],
+    "tags": ["sharepoint", "onedrive", "files", "shared", "list"]
+  },
+  {
+    "id": "sp-get-site-drive-root-items",
+    "description": "List items in the root of a SharePoint site's default document library",
+    "examples": [
+      "Show files in the site's document library",
+      "List root items of the site drive",
+      "What files are in this SharePoint site?"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/sites/{site-id}/drive/root/children",
+    "method": "GET",
+    "scopes": ["Sites.Read.All", "Files.Read.All"],
+    "query_params": {
+      "$select": "id,name,size,lastModifiedDateTime,folder,file",
+      "$top": 50
+    },
+    "tags": ["sharepoint", "sites", "files", "list", "root"]
+  },
+  {
+    "id": "sp-get-site-drive-item-by-path",
+    "description": "Get a file or folder in a SharePoint site's drive by path",
+    "examples": [
+      "Get the file at /Shared Documents/report.docx on site X",
+      "Find a file by path in the SharePoint library"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/sites/{site-id}/drive/root:/{item-path}",
+    "method": "GET",
+    "scopes": ["Sites.Read.All", "Files.Read.All"],
+    "tags": ["sharepoint", "sites", "files", "get", "path"]
+  },
+  {
+    "id": "sp-upload-to-site-drive",
+    "description": "Upload a small file to a SharePoint site's document library",
+    "examples": [
+      "Upload a file to the SharePoint site",
+      "Put this document in the site library",
+      "Upload to the team site"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/sites/{site-id}/drive/items/{parent-id}:/{filename}:/content",
+    "method": "PUT",
+    "scopes": ["Sites.ReadWrite.All", "Files.ReadWrite.All"],
+    "notes": "Upload via PUT for files < 4MB. For larger files, use an upload session. Use @microsoft.graph.conflictBehavior header: rename, replace, or fail.",
+    "tags": ["sharepoint", "sites", "files", "upload", "create"]
+  },
+  {
+    "id": "sp-create-upload-session",
+    "description": "Create an upload session for uploading large files (>4MB)",
+    "examples": [
+      "Upload a large file to OneDrive",
+      "Start an upload session for a big file",
+      "Upload a video to my drive"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/items/{parent-id}:/{filename}:/createUploadSession",
+    "method": "POST",
+    "scopes": ["Files.ReadWrite"],
+    "body_template": {
+      "item": {
+        "@microsoft.graph.conflictBehavior": "rename",
+        "name": "{{filename}}"
+      }
+    },
+    "notes": "Returns an uploadUrl. Upload file bytes in chunks (recommended 5-10MB each) via PUT to the uploadUrl with Content-Range headers.",
+    "tags": ["sharepoint", "onedrive", "files", "upload", "large", "session"]
+  },
+  {
+    "id": "sp-get-drive-item-versions",
+    "description": "List version history for a file",
+    "examples": [
+      "Show version history for this file",
+      "What versions exist for document X?",
+      "List file revisions"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/items/{item-id}/versions",
+    "method": "GET",
+    "scopes": ["Files.Read"],
+    "tags": ["sharepoint", "onedrive", "files", "versions", "history", "list"]
+  },
+  {
+    "id": "sp-restore-drive-item-version",
+    "description": "Restore a previous version of a file",
+    "examples": [
+      "Restore file X to version 2.0",
+      "Roll back to the previous version",
+      "Revert this document"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/drive/items/{item-id}/versions/{version-id}/restoreVersion",
+    "method": "POST",
+    "scopes": ["Files.ReadWrite"],
+    "notes": "This replaces the current file content with the specified version. The current version is preserved as a new version entry.",
+    "tags": ["sharepoint", "onedrive", "files", "versions", "restore"]
+  },
+  {
+    "id": "sp-list-site-columns",
+    "description": "List columns (fields) defined on a SharePoint list",
+    "examples": [
+      "What columns does this list have?",
+      "Show fields in list X",
+      "List the schema for this SharePoint list"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/sites/{site-id}/lists/{list-id}/columns",
+    "method": "GET",
+    "scopes": ["Sites.Read.All"],
+    "notes": "Returns column definitions including displayName, name (internal name), and type. Use internal names when creating or updating list items.",
+    "tags": ["sharepoint", "sites", "lists", "columns", "schema", "list"]
+  },
+  {
+    "id": "sp-list-site-content-types",
+    "description": "List content types available in a SharePoint site",
+    "examples": [
+      "What content types are available on this site?",
+      "List content types for site X",
+      "Show available document types"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/sites/{site-id}/contentTypes",
+    "method": "GET",
+    "scopes": ["Sites.Read.All"],
+    "tags": ["sharepoint", "sites", "content-types", "list"]
+  },
+  {
+    "id": "sp-get-followed-sites",
+    "description": "List SharePoint sites the current user is following",
+    "examples": [
+      "What sites am I following?",
+      "Show my followed SharePoint sites",
+      "List my favorite sites"
+    ],
+    "service": "sharepoint",
+    "endpoint": "/me/followedSites",
+    "method": "GET",
+    "scopes": ["Sites.Read.All"],
+    "tags": ["sharepoint", "sites", "followed", "favorites", "list"]
+  }
+]

@@ -1,0 +1,895 @@
+[
+  {
+    "id": "calendar-list-calendars",
+    "description": "List all calendars owned by or shared with the user",
+    "examples": [
+      "Show me my calendars",
+      "List all my calendars",
+      "What calendars do I have?",
+      "Show shared calendars"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/calendars",
+    "method": "GET",
+    "scopes": ["Calendars.Read"],
+    "query_params": {
+      "$select": "id,name,color,isDefaultCalendar,canEdit,owner"
+    },
+    "notes": "Returns both owned and shared calendars. The isDefaultCalendar property identifies the user's primary calendar. Shared calendars have canEdit=false unless the user has write access.",
+    "tags": ["calendars", "list", "shared", "all calendars"]
+  },
+  {
+    "id": "calendar-get-calendar",
+    "description": "Get a specific calendar by ID",
+    "examples": [
+      "Show me the details of this calendar",
+      "Get calendar information",
+      "What are the properties of this calendar?"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/calendars/{calendar_id}",
+    "method": "GET",
+    "scopes": ["Calendars.Read"],
+    "query_params": {
+      "$select": "id,name,color,isDefaultCalendar,canEdit,canShare,canViewPrivateItems,owner"
+    },
+    "notes": "Returns calendar metadata including permissions (canEdit, canShare, canViewPrivateItems) and the owner information.",
+    "tags": ["calendar", "get", "details", "info"]
+  },
+  {
+    "id": "calendar-create-calendar",
+    "description": "Create a new calendar",
+    "examples": [
+      "Create a new calendar called Work Projects",
+      "Make a new calendar",
+      "Add a calendar for personal events"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/calendars",
+    "method": "POST",
+    "scopes": ["Calendars.ReadWrite"],
+    "body_template": {
+      "name": "string",
+      "color": "string"
+    },
+    "notes": "Color values: auto, lightBlue, lightGreen, lightOrange, lightGray, lightYellow, lightTeal, lightPink, lightBrown, lightRed, maxColor. Returns the created calendar object.",
+    "tags": ["create", "new", "calendar", "add"]
+  },
+  {
+    "id": "calendar-list-events",
+    "description": "List events in the user's default calendar",
+    "examples": [
+      "Show me my upcoming events",
+      "List my calendar events",
+      "What meetings do I have?",
+      "Show my schedule",
+      "What's on my calendar?"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events",
+    "method": "GET",
+    "scopes": ["Calendars.Read"],
+    "query_params": {
+      "$top": "25",
+      "$select": "id,subject,start,end,location,organizer,attendees,isOnlineMeeting,onlineMeetingUrl,isAllDay,recurrence",
+      "$orderby": "start/dateTime",
+      "$filter": "start/dateTime ge '2024-01-01T00:00:00Z'"
+    },
+    "notes": "This endpoint does NOT expand recurring events into individual occurrences. Use /me/calendarView with startDateTime and endDateTime query params to correctly see recurring event instances. Filter by start/dateTime to avoid fetching old events.",
+    "tags": ["events", "meetings", "schedule", "calendar", "list", "upcoming"]
+  },
+  {
+    "id": "calendar-list-events-specific",
+    "description": "List events in a specific (non-default) calendar",
+    "examples": [
+      "Show me events in my Work calendar",
+      "List events from a specific calendar",
+      "What meetings are in my Team calendar?"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/calendars/{calendar_id}/events",
+    "method": "GET",
+    "scopes": ["Calendars.Read"],
+    "query_params": {
+      "$top": "25",
+      "$select": "id,subject,start,end,location,organizer,attendees,isOnlineMeeting,isAllDay",
+      "$orderby": "start/dateTime"
+    },
+    "notes": "Replace {calendar_id} with the calendar's ID. To list events in a specific calendar, first use /me/calendars to find the calendar ID.",
+    "tags": ["events", "specific calendar", "calendar", "list", "meetings"]
+  },
+  {
+    "id": "calendar-get-calendar-view",
+    "description": "Get calendar view for a date range (correctly expands recurring events into individual occurrences)",
+    "examples": [
+      "What's on my calendar this week?",
+      "Show me my meetings for today",
+      "What do I have scheduled next Monday?",
+      "List all events between March 1 and March 15",
+      "Show my calendar for tomorrow"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/calendarView",
+    "method": "GET",
+    "scopes": ["Calendars.Read"],
+    "query_params": {
+      "startDateTime": "2024-01-01T00:00:00Z",
+      "endDateTime": "2024-01-07T23:59:59Z",
+      "$top": "50",
+      "$select": "id,subject,start,end,location,organizer,attendees,isOnlineMeeting,onlineMeetingUrl,isAllDay,isCancelled,responseStatus",
+      "$orderby": "start/dateTime"
+    },
+    "notes": "Use /me/calendarView with startDateTime and endDateTime query params -- this correctly expands recurring events into individual occurrences, unlike /me/events. Both startDateTime and endDateTime are REQUIRED. Dates must be ISO 8601 format. This is the preferred endpoint for 'what's on my calendar' type queries.",
+    "tags": ["calendar view", "date range", "schedule", "recurring", "week", "today", "events", "meetings"]
+  },
+  {
+    "id": "calendar-get-event",
+    "description": "Get a single calendar event by ID with full details",
+    "examples": [
+      "Show me the details of this event",
+      "Get the meeting information",
+      "Open this calendar event",
+      "What are the details of this meeting?"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events/{event_id}",
+    "method": "GET",
+    "scopes": ["Calendars.Read"],
+    "query_params": {
+      "$select": "id,subject,body,start,end,location,organizer,attendees,isOnlineMeeting,onlineMeetingUrl,isAllDay,recurrence,importance,sensitivity,showAs,responseStatus,categories"
+    },
+    "notes": "Returns the full event including body content (HTML). The attendees array includes each person's responseStatus (none, organizer, tentativelyAccepted, accepted, declined). showAs values: free, tentative, busy, oof, workingElsewhere, unknown.",
+    "tags": ["event", "meeting", "get", "details", "info", "calendar"]
+  },
+  {
+    "id": "calendar-search-events",
+    "description": "Search calendar events by subject or body content",
+    "examples": [
+      "Search my calendar for budget review",
+      "Find meetings about project kickoff",
+      "Look for events mentioning quarterly planning"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events",
+    "method": "GET",
+    "scopes": ["Calendars.Read"],
+    "query_params": {
+      "$filter": "contains(subject, 'search term')",
+      "$top": "25",
+      "$select": "id,subject,start,end,location,organizer,attendees",
+      "$orderby": "start/dateTime"
+    },
+    "notes": "Use $filter with contains() for subject search. The contains() function is case-insensitive. For broader search, you can also use $search but it is not supported on all calendar endpoints. Alternative: use /me/calendarView with $filter for date-scoped searches.",
+    "tags": ["search", "find", "query", "events", "meetings", "calendar"]
+  },
+  {
+    "id": "calendar-create-event",
+    "description": "Create a basic calendar event with subject, start time, and end time",
+    "examples": [
+      "Create a meeting tomorrow at 2pm",
+      "Schedule a new event",
+      "Add an event to my calendar",
+      "Book a meeting for Friday at 10am",
+      "Create a 1-hour meeting called Team Sync"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events",
+    "method": "POST",
+    "scopes": ["Calendars.ReadWrite"],
+    "body_template": {
+      "subject": "string",
+      "start": {
+        "dateTime": "2024-01-15T14:00:00",
+        "timeZone": "Eastern Standard Time"
+      },
+      "end": {
+        "dateTime": "2024-01-15T15:00:00",
+        "timeZone": "Eastern Standard Time"
+      },
+      "location": {
+        "displayName": "string"
+      },
+      "body": {
+        "contentType": "HTML",
+        "content": "string"
+      }
+    },
+    "notes": "The dateTime value in start/end should NOT include a Z suffix when timeZone is specified. timeZone uses Windows time zone names (e.g., 'Eastern Standard Time', 'Pacific Standard Time', 'UTC'). If no timeZone is provided, UTC is assumed.",
+    "tags": ["create", "event", "meeting", "schedule", "book", "new", "calendar"]
+  },
+  {
+    "id": "calendar-create-event-with-attendees",
+    "description": "Create a calendar event and invite attendees",
+    "examples": [
+      "Schedule a meeting with John and Sarah",
+      "Create an event and invite the team",
+      "Set up a meeting with attendees",
+      "Book a meeting and send invitations"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events",
+    "method": "POST",
+    "scopes": ["Calendars.ReadWrite"],
+    "body_template": {
+      "subject": "string",
+      "start": {
+        "dateTime": "2024-01-15T14:00:00",
+        "timeZone": "Eastern Standard Time"
+      },
+      "end": {
+        "dateTime": "2024-01-15T15:00:00",
+        "timeZone": "Eastern Standard Time"
+      },
+      "location": {
+        "displayName": "string"
+      },
+      "body": {
+        "contentType": "HTML",
+        "content": "string"
+      },
+      "attendees": [
+        {
+          "emailAddress": {
+            "address": "string",
+            "name": "string"
+          },
+          "type": "required"
+        },
+        {
+          "emailAddress": {
+            "address": "string",
+            "name": "string"
+          },
+          "type": "optional"
+        }
+      ]
+    },
+    "notes": "Attendee type values: 'required', 'optional', 'resource'. Meeting invitations are automatically sent to attendees when the event is created. The organizer is automatically added and does not need to be in the attendees list.",
+    "tags": ["create", "event", "meeting", "attendees", "invite", "schedule", "calendar"]
+  },
+  {
+    "id": "calendar-create-all-day-event",
+    "description": "Create an all-day calendar event",
+    "examples": [
+      "Create an all-day event for Friday",
+      "Add a full-day event to my calendar",
+      "Schedule an all-day out-of-office",
+      "Block off the whole day"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events",
+    "method": "POST",
+    "scopes": ["Calendars.ReadWrite"],
+    "body_template": {
+      "subject": "string",
+      "isAllDay": true,
+      "start": {
+        "dateTime": "2024-01-15T00:00:00",
+        "timeZone": "Eastern Standard Time"
+      },
+      "end": {
+        "dateTime": "2024-01-16T00:00:00",
+        "timeZone": "Eastern Standard Time"
+      },
+      "showAs": "free",
+      "body": {
+        "contentType": "HTML",
+        "content": "string"
+      }
+    },
+    "notes": "For all-day events, set isAllDay=true and use midnight-to-midnight times. The end date should be the NEXT day (e.g., Jan 15 to Jan 16 for a single all-day event on Jan 15). showAs values: 'free', 'tentative', 'busy', 'oof', 'workingElsewhere'.",
+    "tags": ["all day", "full day", "event", "create", "calendar", "block"]
+  },
+  {
+    "id": "calendar-create-online-meeting-event",
+    "description": "Create a calendar event with an online Teams meeting link",
+    "examples": [
+      "Create a Teams meeting",
+      "Schedule an online meeting",
+      "Set up a virtual meeting with a Teams link",
+      "Create a video call event"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events",
+    "method": "POST",
+    "scopes": ["Calendars.ReadWrite"],
+    "body_template": {
+      "subject": "string",
+      "start": {
+        "dateTime": "2024-01-15T14:00:00",
+        "timeZone": "Eastern Standard Time"
+      },
+      "end": {
+        "dateTime": "2024-01-15T15:00:00",
+        "timeZone": "Eastern Standard Time"
+      },
+      "isOnlineMeeting": true,
+      "onlineMeetingProvider": "teamsForBusiness",
+      "attendees": [
+        {
+          "emailAddress": {
+            "address": "string",
+            "name": "string"
+          },
+          "type": "required"
+        }
+      ],
+      "body": {
+        "contentType": "HTML",
+        "content": "string"
+      }
+    },
+    "notes": "Set isOnlineMeeting=true and onlineMeetingProvider='teamsForBusiness' to auto-generate a Teams meeting link. The onlineMeetingUrl will be populated in the response. Other provider options: 'teamsForBusiness', 'skypeForBusiness', 'skypeForConsumer'.",
+    "tags": ["online meeting", "Teams", "virtual", "video call", "create", "event", "calendar"]
+  },
+  {
+    "id": "calendar-create-recurring-event",
+    "description": "Create a recurring calendar event with a recurrence pattern",
+    "examples": [
+      "Create a weekly team standup",
+      "Schedule a recurring meeting every Monday",
+      "Set up a daily check-in",
+      "Create a monthly review meeting",
+      "Schedule a biweekly sync"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events",
+    "method": "POST",
+    "scopes": ["Calendars.ReadWrite"],
+    "body_template": {
+      "subject": "string",
+      "start": {
+        "dateTime": "2024-01-15T09:00:00",
+        "timeZone": "Eastern Standard Time"
+      },
+      "end": {
+        "dateTime": "2024-01-15T09:30:00",
+        "timeZone": "Eastern Standard Time"
+      },
+      "recurrence": {
+        "pattern": {
+          "type": "weekly",
+          "interval": 1,
+          "daysOfWeek": ["monday"],
+          "firstDayOfWeek": "sunday"
+        },
+        "range": {
+          "type": "endDate",
+          "startDate": "2024-01-15",
+          "endDate": "2024-06-30"
+        }
+      },
+      "attendees": [
+        {
+          "emailAddress": {
+            "address": "string",
+            "name": "string"
+          },
+          "type": "required"
+        }
+      ],
+      "body": {
+        "contentType": "HTML",
+        "content": "string"
+      }
+    },
+    "notes": "Pattern type values: 'daily', 'weekly', 'absoluteMonthly', 'relativeMonthly', 'absoluteYearly', 'relativeYearly'. Range type values: 'endDate', 'noEnd', 'numbered' (numberOfOccurrences). For weekly patterns, daysOfWeek can include multiple days. The interval controls frequency (e.g., interval=2 for biweekly).",
+    "tags": ["recurring", "repeat", "weekly", "daily", "monthly", "create", "event", "calendar", "series"]
+  },
+  {
+    "id": "calendar-update-event",
+    "description": "Update an existing calendar event",
+    "examples": [
+      "Change the time of my meeting",
+      "Update the meeting subject",
+      "Reschedule this event",
+      "Move my meeting to 3pm",
+      "Add a location to this event"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events/{event_id}",
+    "method": "PATCH",
+    "scopes": ["Calendars.ReadWrite"],
+    "body_template": {
+      "subject": "string",
+      "start": {
+        "dateTime": "2024-01-15T15:00:00",
+        "timeZone": "Eastern Standard Time"
+      },
+      "end": {
+        "dateTime": "2024-01-15T16:00:00",
+        "timeZone": "Eastern Standard Time"
+      },
+      "location": {
+        "displayName": "string"
+      },
+      "body": {
+        "contentType": "HTML",
+        "content": "string"
+      }
+    },
+    "notes": "Include only the fields you want to change. If attendees are present, updating the event sends update notifications. For recurring events, updating the series master updates all future occurrences.",
+    "tags": ["update", "edit", "modify", "reschedule", "change", "event", "meeting", "calendar"]
+  },
+  {
+    "id": "calendar-delete-event",
+    "description": "Delete a calendar event",
+    "examples": [
+      "Delete this meeting",
+      "Cancel and remove this event",
+      "Remove this from my calendar",
+      "Delete this calendar event"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events/{event_id}",
+    "method": "DELETE",
+    "scopes": ["Calendars.ReadWrite"],
+    "notes": "Returns 204 No Content. If the event has attendees, cancellation notices are automatically sent. For recurring events, deleting the series master deletes all occurrences. To delete a single occurrence, use the occurrence ID.",
+    "tags": ["delete", "remove", "cancel", "event", "meeting", "calendar"]
+  },
+  {
+    "id": "calendar-accept-event",
+    "description": "Accept a calendar event invitation",
+    "examples": [
+      "Accept this meeting invitation",
+      "RSVP yes to this event",
+      "Accept the invite",
+      "I'll attend this meeting"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events/{event_id}/accept",
+    "method": "POST",
+    "scopes": ["Calendars.ReadWrite"],
+    "body_template": {
+      "comment": "string",
+      "sendResponse": true
+    },
+    "notes": "Set sendResponse to true to notify the organizer of your acceptance. The comment is optional and included in the response to the organizer. Returns 202 Accepted.",
+    "tags": ["accept", "RSVP", "yes", "attend", "invitation", "event", "calendar"]
+  },
+  {
+    "id": "calendar-decline-event",
+    "description": "Decline a calendar event invitation",
+    "examples": [
+      "Decline this meeting invitation",
+      "RSVP no to this event",
+      "I can't attend this meeting",
+      "Decline the invite"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events/{event_id}/decline",
+    "method": "POST",
+    "scopes": ["Calendars.ReadWrite"],
+    "body_template": {
+      "comment": "string",
+      "sendResponse": true,
+      "proposedNewTime": {
+        "start": {
+          "dateTime": "2024-01-15T15:00:00",
+          "timeZone": "Eastern Standard Time"
+        },
+        "end": {
+          "dateTime": "2024-01-15T16:00:00",
+          "timeZone": "Eastern Standard Time"
+        }
+      }
+    },
+    "notes": "Set sendResponse to true to notify the organizer. The proposedNewTime is optional and suggests an alternative time when declining. Returns 202 Accepted.",
+    "tags": ["decline", "RSVP", "no", "reject", "invitation", "event", "calendar"]
+  },
+  {
+    "id": "calendar-tentative-event",
+    "description": "Tentatively accept a calendar event invitation",
+    "examples": [
+      "Tentatively accept this meeting",
+      "Mark this event as tentative",
+      "Maybe I'll attend this meeting",
+      "RSVP maybe to this event"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events/{event_id}/tentativelyAccept",
+    "method": "POST",
+    "scopes": ["Calendars.ReadWrite"],
+    "body_template": {
+      "comment": "string",
+      "sendResponse": true,
+      "proposedNewTime": {
+        "start": {
+          "dateTime": "2024-01-15T15:00:00",
+          "timeZone": "Eastern Standard Time"
+        },
+        "end": {
+          "dateTime": "2024-01-15T16:00:00",
+          "timeZone": "Eastern Standard Time"
+        }
+      }
+    },
+    "notes": "Set sendResponse to true to notify the organizer. The proposedNewTime is optional and suggests a preferred time. Returns 202 Accepted.",
+    "tags": ["tentative", "maybe", "RSVP", "tentatively accept", "invitation", "event", "calendar"]
+  },
+  {
+    "id": "calendar-cancel-event",
+    "description": "Cancel an event that you organized (sends cancellation to attendees)",
+    "examples": [
+      "Cancel this meeting",
+      "Cancel the event and notify attendees",
+      "I need to cancel this meeting I organized"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events/{event_id}/cancel",
+    "method": "POST",
+    "scopes": ["Calendars.ReadWrite"],
+    "body_template": {
+      "comment": "string"
+    },
+    "notes": "Only the organizer can cancel an event. This sends cancellation notices to all attendees. The comment is included in the cancellation message. The event is then moved to the Deleted Items. If you are not the organizer, use DELETE instead to remove it from your calendar only.",
+    "tags": ["cancel", "organizer", "cancellation", "event", "meeting", "calendar"]
+  },
+  {
+    "id": "calendar-find-meeting-times",
+    "description": "Find available meeting times that work for all specified attendees",
+    "examples": [
+      "Find a time to meet with John and Sarah",
+      "When are we all free for a meeting?",
+      "Suggest meeting times for the team",
+      "Find available slots for a 1-hour meeting"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/findMeetingTimes",
+    "method": "POST",
+    "scopes": ["Calendars.Read.Shared"],
+    "body_template": {
+      "attendees": [
+        {
+          "emailAddress": {
+            "address": "string",
+            "name": "string"
+          },
+          "type": "required"
+        }
+      ],
+      "timeConstraint": {
+        "activityDomain": "work",
+        "timeSlots": [
+          {
+            "start": {
+              "dateTime": "2024-01-15T08:00:00",
+              "timeZone": "Eastern Standard Time"
+            },
+            "end": {
+              "dateTime": "2024-01-19T17:00:00",
+              "timeZone": "Eastern Standard Time"
+            }
+          }
+        ]
+      },
+      "meetingDuration": "PT1H",
+      "maxCandidates": 5,
+      "isOrganizerOptional": false,
+      "minimumAttendeePercentage": 100
+    },
+    "notes": "meetingDuration uses ISO 8601 duration format (PT1H = 1 hour, PT30M = 30 min). activityDomain values: 'work', 'personal', 'unrestricted', 'unknown'. Set minimumAttendeePercentage to control how many attendees must be available (100 = all required). Returns meetingTimeSuggestions array ranked by confidence.",
+    "tags": ["find time", "meeting times", "availability", "schedule", "free", "busy", "suggest", "calendar"]
+  },
+  {
+    "id": "calendar-get-schedule",
+    "description": "Get the free/busy schedule for one or more users",
+    "examples": [
+      "Check if John is free at 2pm",
+      "Get the availability for these users",
+      "Show me Sarah's free/busy schedule",
+      "When is my manager available?"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/calendar/getSchedule",
+    "method": "POST",
+    "scopes": ["Calendars.Read.Shared"],
+    "body_template": {
+      "schedules": ["user1@contoso.com", "user2@contoso.com"],
+      "startTime": {
+        "dateTime": "2024-01-15T08:00:00",
+        "timeZone": "Eastern Standard Time"
+      },
+      "endTime": {
+        "dateTime": "2024-01-15T17:00:00",
+        "timeZone": "Eastern Standard Time"
+      },
+      "availabilityViewInterval": 30
+    },
+    "notes": "schedules is an array of email addresses or user principal names. availabilityViewInterval is in minutes (15, 30, or 60). The response includes an availabilityView string where each character represents a time slot: 0=free, 1=tentative, 2=busy, 3=out of office, 4=working elsewhere. Also returns scheduleItems with details of each busy block.",
+    "tags": ["schedule", "free busy", "availability", "check", "calendar", "when free"]
+  },
+  {
+    "id": "calendar-list-reminders",
+    "description": "List calendar reminders within a date range",
+    "examples": [
+      "Show me my upcoming reminders",
+      "What reminders do I have this week?",
+      "List calendar reminders for today",
+      "Get my event reminders"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/reminderView(startDateTime='{start}',endDateTime='{end}')",
+    "method": "GET",
+    "scopes": ["Calendars.Read"],
+    "notes": "Replace {start} and {end} with ISO 8601 datetime strings. Returns events that have reminders firing within the specified window. Each result includes the event details and reminderFireTime. The reminderMinutesBeforeStart on each event controls when the reminder fires.",
+    "tags": ["reminders", "alerts", "notifications", "upcoming", "calendar"]
+  },
+  {
+    "id": "calendar-get-calendar-view-specific",
+    "description": "Get calendar view for a specific (non-default) calendar within a date range",
+    "examples": [
+      "Show me this week's events in my Work calendar",
+      "What's on my Team calendar this month?",
+      "Get the calendar view for a specific calendar"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/calendars/{calendar_id}/calendarView",
+    "method": "GET",
+    "scopes": ["Calendars.Read"],
+    "query_params": {
+      "startDateTime": "2024-01-01T00:00:00Z",
+      "endDateTime": "2024-01-07T23:59:59Z",
+      "$top": "50",
+      "$select": "id,subject,start,end,location,organizer,isAllDay,isCancelled",
+      "$orderby": "start/dateTime"
+    },
+    "notes": "Same as /me/calendarView but scoped to a specific calendar by ID. Correctly expands recurring events. Both startDateTime and endDateTime are required.",
+    "tags": ["calendar view", "specific calendar", "date range", "events", "calendar"]
+  },
+  {
+    "id": "calendar-create-event-specific-calendar",
+    "description": "Create an event in a specific (non-default) calendar",
+    "examples": [
+      "Add an event to my Work calendar",
+      "Create a meeting in my Team calendar",
+      "Schedule an event on a specific calendar"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/calendars/{calendar_id}/events",
+    "method": "POST",
+    "scopes": ["Calendars.ReadWrite"],
+    "body_template": {
+      "subject": "string",
+      "start": {
+        "dateTime": "2024-01-15T14:00:00",
+        "timeZone": "Eastern Standard Time"
+      },
+      "end": {
+        "dateTime": "2024-01-15T15:00:00",
+        "timeZone": "Eastern Standard Time"
+      },
+      "location": {
+        "displayName": "string"
+      },
+      "body": {
+        "contentType": "HTML",
+        "content": "string"
+      }
+    },
+    "notes": "Creates the event in a specific calendar rather than the default. The calendar must be owned by or writable by the user (canEdit=true).",
+    "tags": ["create", "event", "specific calendar", "calendar", "meeting"]
+  },
+  {
+    "id": "calendar-add-attendees",
+    "description": "Add attendees to an existing calendar event",
+    "examples": [
+      "Add John to this meeting",
+      "Invite more people to this event",
+      "Add an attendee to this calendar event"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events/{event_id}",
+    "method": "PATCH",
+    "scopes": ["Calendars.ReadWrite"],
+    "body_template": {
+      "attendees": [
+        {
+          "emailAddress": {
+            "address": "string",
+            "name": "string"
+          },
+          "type": "required"
+        }
+      ]
+    },
+    "notes": "The attendees array in the PATCH REPLACES all existing attendees. You must include all current attendees plus any new ones. First GET the event to retrieve existing attendees, then include them all in the PATCH. Update notifications are sent automatically.",
+    "tags": ["add", "attendees", "invite", "update", "event", "meeting", "calendar"]
+  },
+  {
+    "id": "calendar-snooze-reminder",
+    "description": "Snooze a calendar event reminder",
+    "examples": [
+      "Snooze this reminder",
+      "Remind me again in 10 minutes",
+      "Snooze the calendar reminder"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events/{event_id}/snoozeReminder",
+    "method": "POST",
+    "scopes": ["Calendars.ReadWrite"],
+    "body_template": {
+      "newReminderTime": {
+        "dateTime": "2024-01-15T14:10:00",
+        "timeZone": "Eastern Standard Time"
+      }
+    },
+    "notes": "newReminderTime specifies when the reminder should fire again. Returns 200 OK with no body.",
+    "tags": ["snooze", "reminder", "postpone", "later", "event", "calendar"]
+  },
+  {
+    "id": "calendar-dismiss-reminder",
+    "description": "Dismiss a calendar event reminder",
+    "examples": [
+      "Dismiss this reminder",
+      "Clear this calendar notification",
+      "I've seen this reminder, dismiss it"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events/{event_id}/dismissReminder",
+    "method": "POST",
+    "scopes": ["Calendars.ReadWrite"],
+    "notes": "Dismisses the reminder for this event occurrence. Returns 200 OK with no body. For recurring events, this only dismisses the reminder for the current occurrence.",
+    "tags": ["dismiss", "reminder", "clear", "notification", "event", "calendar"]
+  },
+  {
+    "id": "calendar-list-event-instances",
+    "description": "List instances (occurrences) of a recurring event",
+    "examples": [
+      "Show me all occurrences of this recurring meeting",
+      "List instances of this repeating event",
+      "When does this recurring event happen?"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events/{event_id}/instances",
+    "method": "GET",
+    "scopes": ["Calendars.Read"],
+    "query_params": {
+      "startDateTime": "2024-01-01T00:00:00Z",
+      "endDateTime": "2024-06-30T23:59:59Z",
+      "$top": "50",
+      "$select": "id,subject,start,end,isCancelled,originalStartTimeZone"
+    },
+    "notes": "Returns individual occurrences of a recurring event series within the specified date range. Both startDateTime and endDateTime are required. Each instance has its own ID that can be used for accepting, declining, or modifying that single occurrence.",
+    "tags": ["instances", "occurrences", "recurring", "series", "repeat", "event", "calendar"]
+  },
+  {
+    "id": "calendar-update-event-attendee-response",
+    "description": "Update the response status of an event (set show-as status)",
+    "examples": [
+      "Set this meeting to show as tentative",
+      "Mark this event as out of office",
+      "Change my availability for this meeting to free"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events/{event_id}",
+    "method": "PATCH",
+    "scopes": ["Calendars.ReadWrite"],
+    "body_template": {
+      "showAs": "string",
+      "responseStatus": {
+        "response": "string"
+      }
+    },
+    "notes": "showAs values: 'free', 'tentative', 'busy', 'oof' (out of office), 'workingElsewhere', 'unknown'. Use this to control how the time block appears on your calendar without sending a formal response to the organizer.",
+    "tags": ["show as", "status", "availability", "busy", "free", "tentative", "event", "calendar"]
+  },
+  {
+    "id": "calendar-delete-calendar",
+    "description": "Delete a user-created calendar",
+    "examples": [
+      "Delete this calendar",
+      "Remove my old project calendar",
+      "Get rid of this calendar"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/calendars/{calendar_id}",
+    "method": "DELETE",
+    "scopes": ["Calendars.ReadWrite"],
+    "notes": "Permanently deletes the calendar and all events within it. Returns 204 No Content. Cannot delete the default calendar. Only calendars the user owns can be deleted.",
+    "tags": ["delete", "remove", "calendar"]
+  },
+  {
+    "id": "calendar-update-calendar",
+    "description": "Update properties of an existing calendar (name, color)",
+    "examples": [
+      "Rename my calendar to Team Meetings",
+      "Change the color of my Work calendar",
+      "Update the name of this calendar"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/calendars/{calendar_id}",
+    "method": "PATCH",
+    "scopes": ["Calendars.ReadWrite"],
+    "body_template": {
+      "name": "string",
+      "color": "string"
+    },
+    "notes": "Color values: auto, lightBlue, lightGreen, lightOrange, lightGray, lightYellow, lightTeal, lightPink, lightBrown, lightRed, maxColor. Only include properties you want to change.",
+    "tags": ["update", "rename", "color", "calendar", "modify"]
+  },
+  {
+    "id": "calendar-set-event-reminder",
+    "description": "Set or change the reminder time on a calendar event",
+    "examples": [
+      "Set a 15-minute reminder for this meeting",
+      "Change the reminder to 30 minutes before",
+      "Turn off the reminder for this event"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events/{event_id}",
+    "method": "PATCH",
+    "scopes": ["Calendars.ReadWrite"],
+    "body_template": {
+      "isReminderOn": true,
+      "reminderMinutesBeforeStart": 15
+    },
+    "notes": "Set isReminderOn to false to disable the reminder entirely. Common reminderMinutesBeforeStart values: 0 (at time of event), 5, 10, 15, 30, 60, 1440 (1 day), 10080 (1 week).",
+    "tags": ["reminder", "alert", "notification", "event", "calendar", "set"]
+  },
+  {
+    "id": "calendar-list-event-attachments",
+    "description": "List attachments on a calendar event",
+    "examples": [
+      "Show me the attachments on this event",
+      "What files are attached to this meeting?",
+      "List calendar event attachments"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events/{event_id}/attachments",
+    "method": "GET",
+    "scopes": ["Calendars.Read"],
+    "query_params": {
+      "$select": "id,name,contentType,size,isInline"
+    },
+    "notes": "Returns file attachments and reference attachments (cloud file links) on the event. The contentBytes field is base64-encoded and not included in list responses by default -- get a specific attachment by ID to retrieve the content.",
+    "tags": ["attachments", "files", "event", "meeting", "calendar"]
+  },
+  {
+    "id": "calendar-add-event-attachment",
+    "description": "Add a file attachment to a calendar event",
+    "examples": [
+      "Attach a file to this meeting",
+      "Add an agenda document to the event",
+      "Upload an attachment to this calendar event"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events/{event_id}/attachments",
+    "method": "POST",
+    "scopes": ["Calendars.ReadWrite"],
+    "body_template": {
+      "@odata.type": "#microsoft.graph.fileAttachment",
+      "name": "string",
+      "contentType": "string",
+      "contentBytes": "string (base64)"
+    },
+    "notes": "contentBytes must be base64-encoded. Maximum attachment size for a single request is 3MB. For larger files, use an upload session. contentType is the MIME type (e.g., 'application/pdf').",
+    "tags": ["attachment", "add", "upload", "file", "event", "meeting", "calendar"]
+  },
+  {
+    "id": "calendar-forward-event",
+    "description": "Forward a calendar event invitation to another user",
+    "examples": [
+      "Forward this meeting invite to John",
+      "Share this event with sarah@contoso.com",
+      "Forward the calendar invitation"
+    ],
+    "service": "calendar",
+    "endpoint": "/me/events/{event_id}/forward",
+    "method": "POST",
+    "scopes": ["Calendars.ReadWrite"],
+    "body_template": {
+      "toRecipients": [
+        {
+          "emailAddress": {
+            "address": "string",
+            "name": "string"
+          }
+        }
+      ],
+      "comment": "string"
+    },
+    "notes": "Forwards the event as a meeting invitation to the specified recipients. The comment is optional and included in the forwarded invitation message. Returns 202 Accepted with no body.",
+    "tags": ["forward", "share", "invite", "send", "event", "meeting", "calendar"]
+  }
+]

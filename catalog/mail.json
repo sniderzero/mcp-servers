@@ -1,0 +1,1276 @@
+[
+  {
+    "id": "mail-list-inbox",
+    "description": "List messages in the user's inbox (default mail folder)",
+    "examples": [
+      "Show me my recent emails",
+      "List my inbox messages",
+      "What emails do I have?",
+      "Get my latest mail",
+      "Check my inbox"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/inbox/messages",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$top": "25",
+      "$select": "id,subject,from,receivedDateTime,isRead,bodyPreview",
+      "$orderby": "receivedDateTime desc"
+    },
+    "notes": "Defaults to top 25 messages ordered by most recent. Use $top to control page size (max 1000). The bodyPreview field returns first 255 characters.",
+    "tags": ["inbox", "messages", "list", "email", "mail", "recent"]
+  },
+  {
+    "id": "mail-list-folder-by-id",
+    "description": "List messages in a specific mail folder by folder ID",
+    "examples": [
+      "Show me messages in folder AAMkAG...",
+      "List emails in this folder ID",
+      "Get messages from a specific folder"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/{folder_id}/messages",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$top": "25",
+      "$select": "id,subject,from,receivedDateTime,isRead,bodyPreview",
+      "$orderby": "receivedDateTime desc"
+    },
+    "notes": "Replace {folder_id} with the actual folder ID. Use /me/mailFolders to discover folder IDs first.",
+    "tags": ["folder", "messages", "list", "email", "specific folder"]
+  },
+  {
+    "id": "mail-list-sent-items",
+    "description": "List messages in the Sent Items folder",
+    "examples": [
+      "Show me my sent emails",
+      "What emails have I sent recently?",
+      "List my sent messages",
+      "Check my sent mail"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/sentitems/messages",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$top": "25",
+      "$select": "id,subject,toRecipients,sentDateTime,bodyPreview",
+      "$orderby": "sentDateTime desc"
+    },
+    "notes": "Well-known folder name 'sentitems' can be used directly in the URL instead of a folder ID.",
+    "tags": ["sent", "sent items", "outbox", "sent mail", "messages"]
+  },
+  {
+    "id": "mail-list-drafts",
+    "description": "List messages in the Drafts folder",
+    "examples": [
+      "Show me my draft emails",
+      "List my drafts",
+      "What drafts do I have?",
+      "Check my email drafts"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/drafts/messages",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$top": "25",
+      "$select": "id,subject,toRecipients,createdDateTime,bodyPreview",
+      "$orderby": "createdDateTime desc"
+    },
+    "notes": "Well-known folder name 'drafts' can be used directly. Draft messages have isDraft=true.",
+    "tags": ["drafts", "draft", "unsent", "composing", "messages"]
+  },
+  {
+    "id": "mail-list-deleted-items",
+    "description": "List messages in the Deleted Items (trash) folder",
+    "examples": [
+      "Show me my deleted emails",
+      "What's in my trash?",
+      "List deleted messages",
+      "Check my deleted items"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/deleteditems/messages",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$top": "25",
+      "$select": "id,subject,from,receivedDateTime,bodyPreview",
+      "$orderby": "receivedDateTime desc"
+    },
+    "notes": "Well-known folder name 'deleteditems' maps to Deleted Items / Trash.",
+    "tags": ["deleted", "trash", "deleted items", "removed", "messages"]
+  },
+  {
+    "id": "mail-list-junk",
+    "description": "List messages in the Junk Email (spam) folder",
+    "examples": [
+      "Show me my junk email",
+      "What's in my spam folder?",
+      "List junk messages",
+      "Check spam"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/junkemail/messages",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$top": "25",
+      "$select": "id,subject,from,receivedDateTime,bodyPreview",
+      "$orderby": "receivedDateTime desc"
+    },
+    "notes": "Well-known folder name 'junkemail' maps to Junk Email / Spam.",
+    "tags": ["junk", "spam", "junk email", "phishing", "messages"]
+  },
+  {
+    "id": "mail-list-archive",
+    "description": "List messages in the Archive folder",
+    "examples": [
+      "Show me my archived emails",
+      "What's in my archive?",
+      "List archived messages",
+      "Check my email archive"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/archive/messages",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$top": "25",
+      "$select": "id,subject,from,receivedDateTime,bodyPreview",
+      "$orderby": "receivedDateTime desc"
+    },
+    "notes": "Well-known folder name 'archive' maps to the Archive folder. Not all mailboxes have an archive folder enabled.",
+    "tags": ["archive", "archived", "old emails", "messages"]
+  },
+  {
+    "id": "mail-get-message",
+    "description": "Get a single email message by ID with full body content",
+    "examples": [
+      "Open this email",
+      "Show me the full email with ID AAMkAG...",
+      "Read this message",
+      "Get the details of this email",
+      "Show me the body of this email"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$select": "id,subject,from,toRecipients,ccRecipients,body,receivedDateTime,hasAttachments,importance,isRead,flag"
+    },
+    "notes": "Returns the full message including body content. The body.content field contains HTML by default. Add Prefer: outlook.body-content-type=\"text\" header to get plain text instead.",
+    "tags": ["message", "email", "read", "get", "open", "details", "body"]
+  },
+  {
+    "id": "mail-search-messages",
+    "description": "Search messages across all folders using KQL (Keyword Query Language) via $search",
+    "examples": [
+      "Search my emails for project update",
+      "Find emails about budget review",
+      "Search for emails mentioning quarterly report",
+      "Look through my mail for contract"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$search": "\"search terms here\"",
+      "$top": "25",
+      "$select": "id,subject,from,receivedDateTime,bodyPreview"
+    },
+    "notes": "The $search parameter uses KQL syntax. Pass the query in double quotes. $search and $filter CANNOT be combined on /me/messages. $search automatically searches across subject, body, and sender. Results are ranked by relevance, not date.",
+    "tags": ["search", "find", "query", "lookup", "messages", "KQL"]
+  },
+  {
+    "id": "mail-search-from",
+    "description": "Search messages from a specific sender using $search with from: KQL keyword",
+    "examples": [
+      "Find emails from john@contoso.com",
+      "Search for messages from Sarah",
+      "Show me emails sent by my manager",
+      "What has alice@company.com sent me?"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$search": "\"from:john@contoso.com\"",
+      "$top": "25",
+      "$select": "id,subject,from,receivedDateTime,bodyPreview"
+    },
+    "notes": "Use from: KQL keyword inside $search to filter by sender. Example: $search=\"from:john@contoso.com\". You can also use display names: $search=\"from:John Smith\". Cannot combine $search with $filter.",
+    "tags": ["search", "from", "sender", "sent by", "messages"]
+  },
+  {
+    "id": "mail-search-subject",
+    "description": "Search messages by subject line using $search with subject: KQL keyword",
+    "examples": [
+      "Find emails with subject containing meeting notes",
+      "Search for emails with 'invoice' in the subject",
+      "Look for messages about weekly standup in subject"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$search": "\"subject:meeting notes\"",
+      "$top": "25",
+      "$select": "id,subject,from,receivedDateTime,bodyPreview"
+    },
+    "notes": "Use subject: KQL keyword inside $search to search only the subject field. Cannot combine $search with $filter.",
+    "tags": ["search", "subject", "title", "heading", "messages"]
+  },
+  {
+    "id": "mail-search-has-attachments",
+    "description": "Search for messages that have attachments using $search with hasAttachments: KQL keyword",
+    "examples": [
+      "Find emails with attachments",
+      "Search for messages that have files attached",
+      "Show me emails with attachments about the project"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$search": "\"hasAttachments:true\"",
+      "$top": "25",
+      "$select": "id,subject,from,receivedDateTime,hasAttachments,bodyPreview"
+    },
+    "notes": "Use hasAttachments:true inside $search. Can be combined with other KQL keywords like from: or subject: within the same $search string. Cannot combine $search with $filter.",
+    "tags": ["search", "attachments", "files", "has attachments", "messages"]
+  },
+  {
+    "id": "mail-filter-unread",
+    "description": "Filter messages to show only unread emails",
+    "examples": [
+      "Show me my unread emails",
+      "How many unread messages do I have?",
+      "List unread mail",
+      "What haven't I read yet?"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/inbox/messages",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$filter": "isRead eq false",
+      "$top": "25",
+      "$select": "id,subject,from,receivedDateTime,bodyPreview",
+      "$orderby": "receivedDateTime desc"
+    },
+    "notes": "Use $filter with isRead eq false. $filter can be combined with $orderby but NOT with $search. You can also add $count=true to get the total count of unread messages.",
+    "tags": ["unread", "new", "not read", "filter", "messages"]
+  },
+  {
+    "id": "mail-filter-importance",
+    "description": "Filter messages by importance level (high, normal, low)",
+    "examples": [
+      "Show me high importance emails",
+      "List important messages",
+      "Find urgent emails",
+      "Show low priority emails"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/inbox/messages",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$filter": "importance eq 'high'",
+      "$top": "25",
+      "$select": "id,subject,from,receivedDateTime,importance,bodyPreview",
+      "$orderby": "receivedDateTime desc"
+    },
+    "notes": "Valid importance values: 'low', 'normal', 'high'. The value must be quoted in the filter expression. Can combine with other $filter clauses using 'and'.",
+    "tags": ["importance", "important", "priority", "urgent", "high priority", "filter", "messages"]
+  },
+  {
+    "id": "mail-filter-date-range",
+    "description": "Filter messages received within a specific date range",
+    "examples": [
+      "Show me emails from last week",
+      "List messages received today",
+      "Find emails from January",
+      "Get emails between March 1 and March 15",
+      "What emails came in yesterday?"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/inbox/messages",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$filter": "receivedDateTime ge 2024-01-01T00:00:00Z and receivedDateTime lt 2024-01-31T23:59:59Z",
+      "$top": "25",
+      "$select": "id,subject,from,receivedDateTime,bodyPreview",
+      "$orderby": "receivedDateTime desc"
+    },
+    "notes": "Use receivedDateTime with ge (greater than or equal) and lt (less than) operators. Dates must be in ISO 8601 format with timezone (Z for UTC). Can combine with other filters using 'and'.",
+    "tags": ["date", "date range", "received", "time", "when", "filter", "messages", "today", "yesterday", "last week"]
+  },
+  {
+    "id": "mail-send",
+    "description": "Send a new email message",
+    "examples": [
+      "Send an email to john@contoso.com",
+      "Compose and send a new email",
+      "Email Sarah about the meeting",
+      "Send a message to my team",
+      "Write and send an email"
+    ],
+    "service": "mail",
+    "endpoint": "/me/sendMail",
+    "method": "POST",
+    "scopes": ["Mail.Send"],
+    "body_template": {
+      "message": {
+        "subject": "string",
+        "body": {
+          "contentType": "HTML",
+          "content": "string"
+        },
+        "toRecipients": [
+          {
+            "emailAddress": {
+              "address": "string",
+              "name": "string"
+            }
+          }
+        ]
+      },
+      "saveToSentItems": true
+    },
+    "notes": "sendMail returns 202 Accepted with no response body. Set saveToSentItems to false to skip saving in Sent Items. contentType can be 'HTML' or 'Text'.",
+    "tags": ["send", "compose", "new email", "write", "mail", "create"]
+  },
+  {
+    "id": "mail-send-cc-bcc",
+    "description": "Send a new email with CC and BCC recipients",
+    "examples": [
+      "Send an email with CC to my manager",
+      "Email john with CC to sarah and BCC to admin",
+      "Send a message and copy my team",
+      "Compose an email with CC and blind copy"
+    ],
+    "service": "mail",
+    "endpoint": "/me/sendMail",
+    "method": "POST",
+    "scopes": ["Mail.Send"],
+    "body_template": {
+      "message": {
+        "subject": "string",
+        "body": {
+          "contentType": "HTML",
+          "content": "string"
+        },
+        "toRecipients": [
+          {
+            "emailAddress": {
+              "address": "string",
+              "name": "string"
+            }
+          }
+        ],
+        "ccRecipients": [
+          {
+            "emailAddress": {
+              "address": "string",
+              "name": "string"
+            }
+          }
+        ],
+        "bccRecipients": [
+          {
+            "emailAddress": {
+              "address": "string",
+              "name": "string"
+            }
+          }
+        ]
+      },
+      "saveToSentItems": true
+    },
+    "notes": "sendMail returns 202 Accepted with no response body. CC recipients are visible to all; BCC recipients are hidden. All recipient arrays follow the same format.",
+    "tags": ["send", "cc", "bcc", "carbon copy", "blind copy", "recipients", "mail"]
+  },
+  {
+    "id": "mail-reply",
+    "description": "Reply to a specific email message",
+    "examples": [
+      "Reply to this email",
+      "Send a reply to this message",
+      "Respond to this email",
+      "Reply back to the sender"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}/reply",
+    "method": "POST",
+    "scopes": ["Mail.Send"],
+    "body_template": {
+      "message": {
+        "toRecipients": [
+          {
+            "emailAddress": {
+              "address": "string",
+              "name": "string"
+            }
+          }
+        ]
+      },
+      "comment": "string"
+    },
+    "notes": "The comment field is the reply body text (plain text). The toRecipients in the message object is optional and overrides the default reply-to address. Returns 202 Accepted with no body.",
+    "tags": ["reply", "respond", "answer", "re", "messages"]
+  },
+  {
+    "id": "mail-reply-all",
+    "description": "Reply all to an email message, responding to all recipients",
+    "examples": [
+      "Reply all to this email",
+      "Respond to everyone on this thread",
+      "Reply to all recipients",
+      "Send a reply all"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}/replyAll",
+    "method": "POST",
+    "scopes": ["Mail.Send"],
+    "body_template": {
+      "comment": "string"
+    },
+    "notes": "Replies to the sender and all toRecipients and ccRecipients. The comment field is the reply body (plain text). Returns 202 Accepted with no body.",
+    "tags": ["reply all", "respond all", "everyone", "all recipients", "messages"]
+  },
+  {
+    "id": "mail-forward",
+    "description": "Forward an email message to other recipients",
+    "examples": [
+      "Forward this email to john@contoso.com",
+      "Send this message to someone else",
+      "Forward this to my manager",
+      "Pass this email along to the team"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}/forward",
+    "method": "POST",
+    "scopes": ["Mail.Send"],
+    "body_template": {
+      "comment": "string",
+      "toRecipients": [
+        {
+          "emailAddress": {
+            "address": "string",
+            "name": "string"
+          }
+        }
+      ]
+    },
+    "notes": "The comment field is optional text prepended to the forwarded message. toRecipients is required. Returns 202 Accepted with no body.",
+    "tags": ["forward", "fwd", "pass along", "send to", "messages"]
+  },
+  {
+    "id": "mail-create-draft",
+    "description": "Create a new draft email message in the Drafts folder",
+    "examples": [
+      "Create a draft email",
+      "Start composing an email but don't send it",
+      "Save an email as draft",
+      "Draft a message to john@contoso.com"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages",
+    "method": "POST",
+    "scopes": ["Mail.ReadWrite"],
+    "body_template": {
+      "subject": "string",
+      "body": {
+        "contentType": "HTML",
+        "content": "string"
+      },
+      "toRecipients": [
+        {
+          "emailAddress": {
+            "address": "string",
+            "name": "string"
+          }
+        }
+      ],
+      "ccRecipients": [
+        {
+          "emailAddress": {
+            "address": "string",
+            "name": "string"
+          }
+        }
+      ],
+      "importance": "normal"
+    },
+    "notes": "Creating a message via POST to /me/messages saves it as a draft (isDraft=true). To send it later, use POST /me/messages/{id}/send. importance can be 'low', 'normal', or 'high'.",
+    "tags": ["draft", "compose", "create", "save", "unsent", "messages"]
+  },
+  {
+    "id": "mail-update-draft",
+    "description": "Update an existing draft email message",
+    "examples": [
+      "Update my draft email",
+      "Edit a draft message",
+      "Change the subject of my draft",
+      "Modify a draft before sending"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}",
+    "method": "PATCH",
+    "scopes": ["Mail.ReadWrite"],
+    "body_template": {
+      "subject": "string",
+      "body": {
+        "contentType": "HTML",
+        "content": "string"
+      },
+      "toRecipients": [
+        {
+          "emailAddress": {
+            "address": "string",
+            "name": "string"
+          }
+        }
+      ]
+    },
+    "notes": "Only draft messages (isDraft=true) can have their content updated. You can update subject, body, recipients, importance, and other writable properties. Include only the fields you want to change.",
+    "tags": ["update", "edit", "modify", "draft", "change", "messages"]
+  },
+  {
+    "id": "mail-delete-message",
+    "description": "Delete an email message (moves to Deleted Items)",
+    "examples": [
+      "Delete this email",
+      "Remove this message",
+      "Trash this email",
+      "Get rid of this message"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}",
+    "method": "DELETE",
+    "scopes": ["Mail.ReadWrite"],
+    "notes": "Moves the message to the Deleted Items folder. Returns 204 No Content. To permanently delete, delete from the Deleted Items folder.",
+    "tags": ["delete", "remove", "trash", "discard", "messages"]
+  },
+  {
+    "id": "mail-move-message",
+    "description": "Move a message to a different mail folder",
+    "examples": [
+      "Move this email to the archive",
+      "Move this message to a folder",
+      "File this email in my Projects folder",
+      "Move this to the trash"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}/move",
+    "method": "POST",
+    "scopes": ["Mail.ReadWrite"],
+    "body_template": {
+      "destinationId": "string"
+    },
+    "notes": "destinationId can be a folder ID or a well-known folder name (inbox, sentitems, drafts, deleteditems, junkemail, archive). Returns the moved message object with updated parentFolderId.",
+    "tags": ["move", "relocate", "file", "organize", "folder", "messages"]
+  },
+  {
+    "id": "mail-copy-message",
+    "description": "Copy a message to another mail folder",
+    "examples": [
+      "Copy this email to my archive",
+      "Duplicate this message to another folder",
+      "Make a copy of this email in my Projects folder"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}/copy",
+    "method": "POST",
+    "scopes": ["Mail.ReadWrite"],
+    "body_template": {
+      "destinationId": "string"
+    },
+    "notes": "destinationId can be a folder ID or a well-known folder name. Returns a copy of the message in the destination folder with a new ID.",
+    "tags": ["copy", "duplicate", "clone", "folder", "messages"]
+  },
+  {
+    "id": "mail-flag-message",
+    "description": "Flag an email message for follow-up",
+    "examples": [
+      "Flag this email",
+      "Mark this message for follow-up",
+      "Add a flag to this email",
+      "Flag this for later"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}",
+    "method": "PATCH",
+    "scopes": ["Mail.ReadWrite"],
+    "body_template": {
+      "flag": {
+        "flagStatus": "flagged"
+      }
+    },
+    "notes": "flagStatus values: 'notFlagged', 'flagged', 'complete'. You can optionally include startDateTime and dueDateTime in the flag object for timed follow-ups.",
+    "tags": ["flag", "follow-up", "mark", "reminder", "todo", "messages"]
+  },
+  {
+    "id": "mail-unflag-message",
+    "description": "Remove the flag from an email message",
+    "examples": [
+      "Unflag this email",
+      "Remove the flag from this message",
+      "Clear the follow-up flag",
+      "Mark this flag as not flagged"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}",
+    "method": "PATCH",
+    "scopes": ["Mail.ReadWrite"],
+    "body_template": {
+      "flag": {
+        "flagStatus": "notFlagged"
+      }
+    },
+    "notes": "Set flagStatus to 'notFlagged' to remove the flag. Use 'complete' to mark the flag as completed instead of removing it.",
+    "tags": ["unflag", "remove flag", "clear flag", "messages"]
+  },
+  {
+    "id": "mail-mark-read",
+    "description": "Mark an email message as read",
+    "examples": [
+      "Mark this email as read",
+      "Set this message to read",
+      "I've read this email",
+      "Mark as read"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}",
+    "method": "PATCH",
+    "scopes": ["Mail.ReadWrite"],
+    "body_template": {
+      "isRead": true
+    },
+    "notes": "Sets isRead to true. Returns the updated message object.",
+    "tags": ["read", "mark read", "seen", "messages"]
+  },
+  {
+    "id": "mail-mark-unread",
+    "description": "Mark an email message as unread",
+    "examples": [
+      "Mark this email as unread",
+      "Set this message to unread",
+      "Make this email unread again",
+      "Mark as unread"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}",
+    "method": "PATCH",
+    "scopes": ["Mail.ReadWrite"],
+    "body_template": {
+      "isRead": false
+    },
+    "notes": "Sets isRead to false. Returns the updated message object.",
+    "tags": ["unread", "mark unread", "unseen", "new", "messages"]
+  },
+  {
+    "id": "mail-list-folders",
+    "description": "List top-level mail folders in the mailbox",
+    "examples": [
+      "Show me my mail folders",
+      "List my email folders",
+      "What folders do I have?",
+      "Show my mailbox folder structure"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$top": "50",
+      "$select": "id,displayName,parentFolderId,childFolderCount,totalItemCount,unreadItemCount"
+    },
+    "notes": "Returns top-level folders only. Use /me/mailFolders/{id}/childFolders to get subfolders. Well-known folder names: inbox, sentitems, drafts, deleteditems, junkemail, archive.",
+    "tags": ["folders", "list", "mail folders", "mailbox", "structure"]
+  },
+  {
+    "id": "mail-list-child-folders",
+    "description": "List child (sub) folders of a specific mail folder",
+    "examples": [
+      "Show me subfolders of my inbox",
+      "List child folders of this folder",
+      "What subfolders are in this mail folder?",
+      "Get nested folders"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/{folder_id}/childFolders",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$top": "50",
+      "$select": "id,displayName,parentFolderId,childFolderCount,totalItemCount,unreadItemCount"
+    },
+    "notes": "Replace {folder_id} with a folder ID or a well-known folder name. To get subfolders of Inbox, use /me/mailFolders/inbox/childFolders.",
+    "tags": ["child folders", "subfolders", "nested", "folder hierarchy", "mail folders"]
+  },
+  {
+    "id": "mail-create-folder",
+    "description": "Create a new top-level mail folder",
+    "examples": [
+      "Create a new email folder called Projects",
+      "Make a new mail folder",
+      "Add a folder to my mailbox",
+      "Create an email folder named Clients"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders",
+    "method": "POST",
+    "scopes": ["Mail.ReadWrite"],
+    "body_template": {
+      "displayName": "string",
+      "isHidden": false
+    },
+    "notes": "Creates a top-level folder under the mailbox root. Set isHidden to true to create a hidden folder. Returns the created folder object with its ID.",
+    "tags": ["create", "new", "folder", "mail folder", "add"]
+  },
+  {
+    "id": "mail-create-child-folder",
+    "description": "Create a child (sub) folder under an existing mail folder",
+    "examples": [
+      "Create a subfolder under my Projects folder",
+      "Make a new folder inside inbox",
+      "Add a child folder to this mail folder",
+      "Create a nested folder"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/{folder_id}/childFolders",
+    "method": "POST",
+    "scopes": ["Mail.ReadWrite"],
+    "body_template": {
+      "displayName": "string",
+      "isHidden": false
+    },
+    "notes": "Creates a subfolder inside the specified parent folder. The parent can be identified by folder ID or well-known name (e.g., inbox).",
+    "tags": ["create", "child folder", "subfolder", "nested", "mail folder"]
+  },
+  {
+    "id": "mail-delete-folder",
+    "description": "Delete a mail folder and all its contents",
+    "examples": [
+      "Delete this mail folder",
+      "Remove the Projects email folder",
+      "Delete a folder from my mailbox"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/{folder_id}",
+    "method": "DELETE",
+    "scopes": ["Mail.ReadWrite"],
+    "notes": "Permanently deletes the folder and all its contents (messages and child folders). Returns 204 No Content. Cannot delete well-known folders (inbox, sentitems, etc.).",
+    "tags": ["delete", "remove", "folder", "mail folder"]
+  },
+  {
+    "id": "mail-rename-folder",
+    "description": "Rename a mail folder",
+    "examples": [
+      "Rename my Projects folder to Active Projects",
+      "Change the name of this mail folder",
+      "Update the folder name"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/{folder_id}",
+    "method": "PATCH",
+    "scopes": ["Mail.ReadWrite"],
+    "body_template": {
+      "displayName": "string"
+    },
+    "notes": "Updates the displayName of the folder. Cannot rename well-known folders (inbox, sentitems, etc.). Returns the updated folder object.",
+    "tags": ["rename", "update", "folder", "mail folder", "name"]
+  },
+  {
+    "id": "mail-list-categories",
+    "description": "List all Outlook categories defined for the user",
+    "examples": [
+      "Show me my email categories",
+      "List my Outlook categories",
+      "What categories do I have?",
+      "Show all available categories"
+    ],
+    "service": "mail",
+    "endpoint": "/me/outlook/masterCategories",
+    "method": "GET",
+    "scopes": ["MailboxSettings.Read"],
+    "notes": "Returns all categories defined in the user's master category list. Each category has a displayName and color. Colors are preset values like 'preset0' through 'preset24'.",
+    "tags": ["categories", "labels", "tags", "outlook", "list"]
+  },
+  {
+    "id": "mail-create-category",
+    "description": "Create a new Outlook category",
+    "examples": [
+      "Create a new email category called Important Clients",
+      "Add a new category with a red color",
+      "Make a new Outlook category"
+    ],
+    "service": "mail",
+    "endpoint": "/me/outlook/masterCategories",
+    "method": "POST",
+    "scopes": ["MailboxSettings.ReadWrite"],
+    "body_template": {
+      "displayName": "string",
+      "color": "string"
+    },
+    "notes": "Color values are preset strings: 'preset0' (red) through 'preset24'. Use 'none' for no color. Category displayName must be unique.",
+    "tags": ["create", "category", "label", "tag", "outlook"]
+  },
+  {
+    "id": "mail-delete-category",
+    "description": "Delete an Outlook category",
+    "examples": [
+      "Delete the 'Old Projects' category",
+      "Remove this Outlook category",
+      "Get rid of this email category"
+    ],
+    "service": "mail",
+    "endpoint": "/me/outlook/masterCategories/{category_id}",
+    "method": "DELETE",
+    "scopes": ["MailboxSettings.ReadWrite"],
+    "notes": "The category_id is the URL-encoded displayName of the category. Returns 204 No Content. Deleting a category does not remove it from messages that already have it assigned.",
+    "tags": ["delete", "remove", "category", "label", "tag", "outlook"]
+  },
+  {
+    "id": "mail-assign-categories",
+    "description": "Assign categories to an email message",
+    "examples": [
+      "Add the 'Urgent' category to this email",
+      "Tag this message with a category",
+      "Categorize this email as 'Project Alpha'",
+      "Label this email"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}",
+    "method": "PATCH",
+    "scopes": ["Mail.ReadWrite"],
+    "body_template": {
+      "categories": ["string", "string"]
+    },
+    "notes": "The categories property is an array of category displayName strings. This REPLACES all existing categories. To add a category, first GET the message to read existing categories, then include them all in the PATCH. Categories must exist in the master category list.",
+    "tags": ["assign", "categories", "label", "tag", "categorize", "messages"]
+  },
+  {
+    "id": "mail-remove-categories",
+    "description": "Remove all categories from an email message",
+    "examples": [
+      "Remove categories from this email",
+      "Clear the labels on this message",
+      "Uncategorize this email",
+      "Remove all tags from this message"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}",
+    "method": "PATCH",
+    "scopes": ["Mail.ReadWrite"],
+    "body_template": {
+      "categories": []
+    },
+    "notes": "Set categories to an empty array to remove all. To remove only specific categories, GET the message first, then PATCH with the remaining categories you want to keep.",
+    "tags": ["remove", "categories", "uncategorize", "clear labels", "messages"]
+  },
+  {
+    "id": "mail-list-attachments",
+    "description": "List all attachments on an email message",
+    "examples": [
+      "Show me the attachments on this email",
+      "What files are attached to this message?",
+      "List attachments",
+      "Does this email have attachments?"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}/attachments",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$select": "id,name,contentType,size,isInline"
+    },
+    "notes": "Returns file attachments, item attachments (embedded messages), and reference attachments (links to cloud files). The contentBytes field contains base64-encoded file content but is not returned by default in list operations.",
+    "tags": ["attachments", "files", "attached", "list", "messages"]
+  },
+  {
+    "id": "mail-get-attachment",
+    "description": "Get a specific attachment from an email message including its content",
+    "examples": [
+      "Download this attachment",
+      "Get the file attached to this email",
+      "Open the attachment named report.pdf",
+      "Get attachment content"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}/attachments/{attachment_id}",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "notes": "Returns the full attachment including contentBytes (base64-encoded). For large attachments (>3MB), use the /$value endpoint to stream the raw bytes. The @odata.type indicates the attachment type: #microsoft.graph.fileAttachment, #microsoft.graph.itemAttachment, or #microsoft.graph.referenceAttachment.",
+    "tags": ["attachment", "download", "file", "get", "content", "messages"]
+  },
+  {
+    "id": "mail-add-attachment",
+    "description": "Add a file attachment to a draft email message",
+    "examples": [
+      "Attach a file to my draft",
+      "Add an attachment to this draft email",
+      "Upload a file to this draft message"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}/attachments",
+    "method": "POST",
+    "scopes": ["Mail.ReadWrite"],
+    "body_template": {
+      "@odata.type": "#microsoft.graph.fileAttachment",
+      "name": "string",
+      "contentType": "string",
+      "contentBytes": "string (base64)"
+    },
+    "notes": "contentBytes must be base64-encoded. The message must be a draft (isDraft=true). For files larger than 3MB, use the upload session API instead. contentType is the MIME type (e.g., 'application/pdf', 'image/png').",
+    "tags": ["attachment", "add", "upload", "file", "draft", "messages"]
+  },
+  {
+    "id": "mail-list-rules",
+    "description": "List all inbox rules (mail flow rules)",
+    "examples": [
+      "Show me my inbox rules",
+      "List my email rules",
+      "What mail rules do I have?",
+      "Show my mail flow rules"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/inbox/messageRules",
+    "method": "GET",
+    "scopes": ["MailboxSettings.Read"],
+    "notes": "Returns all rules that apply to the inbox. Each rule has conditions, actions, and exceptions. Rules are evaluated in order of their sequence property.",
+    "tags": ["rules", "inbox rules", "mail rules", "automation", "filters", "list"]
+  },
+  {
+    "id": "mail-get-rule",
+    "description": "Get a specific inbox rule by ID",
+    "examples": [
+      "Show me the details of this inbox rule",
+      "Get inbox rule information",
+      "What does this mail rule do?"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/inbox/messageRules/{rule_id}",
+    "method": "GET",
+    "scopes": ["MailboxSettings.Read"],
+    "notes": "Returns the full rule definition including conditions, actions, and exceptions.",
+    "tags": ["rule", "inbox rule", "get", "details", "mail rule"]
+  },
+  {
+    "id": "mail-create-rule",
+    "description": "Create a new inbox rule to automatically process incoming messages",
+    "examples": [
+      "Create a rule to move emails from john@contoso.com to my Projects folder",
+      "Set up an inbox rule to mark newsletters as read",
+      "Make a rule to flag emails with 'urgent' in the subject",
+      "Create an auto-reply rule"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/inbox/messageRules",
+    "method": "POST",
+    "scopes": ["MailboxSettings.ReadWrite"],
+    "body_template": {
+      "displayName": "string",
+      "sequence": 1,
+      "isEnabled": true,
+      "conditions": {
+        "senderContains": ["string"],
+        "subjectContains": ["string"],
+        "fromAddresses": [
+          {
+            "emailAddress": {
+              "address": "string",
+              "name": "string"
+            }
+          }
+        ],
+        "bodyContains": ["string"],
+        "importance": "string",
+        "hasAttachments": false
+      },
+      "actions": {
+        "moveToFolder": "string",
+        "copyToFolder": "string",
+        "markAsRead": false,
+        "markImportance": "string",
+        "forwardTo": [
+          {
+            "emailAddress": {
+              "address": "string",
+              "name": "string"
+            }
+          }
+        ],
+        "delete": false,
+        "stopProcessingRules": false
+      }
+    },
+    "notes": "Include only the conditions and actions you need. The sequence determines rule evaluation order (lower numbers run first). moveToFolder requires a folder ID, not a well-known name. Set stopProcessingRules to true to prevent subsequent rules from running.",
+    "tags": ["create", "rule", "inbox rule", "automation", "filter", "auto"]
+  },
+  {
+    "id": "mail-delete-rule",
+    "description": "Delete an inbox rule",
+    "examples": [
+      "Delete this inbox rule",
+      "Remove my email rule",
+      "Get rid of this mail rule"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/inbox/messageRules/{rule_id}",
+    "method": "DELETE",
+    "scopes": ["MailboxSettings.ReadWrite"],
+    "notes": "Permanently deletes the rule. Returns 204 No Content.",
+    "tags": ["delete", "remove", "rule", "inbox rule", "mail rule"]
+  },
+  {
+    "id": "mail-send-draft",
+    "description": "Send a previously created draft email message",
+    "examples": [
+      "Send my draft email",
+      "Send the draft message I created",
+      "Dispatch this draft"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}/send",
+    "method": "POST",
+    "scopes": ["Mail.Send"],
+    "notes": "The message must be a draft (isDraft=true). Returns 202 Accepted with no response body. The message is moved to Sent Items after sending.",
+    "tags": ["send", "draft", "dispatch", "mail", "messages"]
+  },
+  {
+    "id": "mail-create-reply-draft",
+    "description": "Create a draft reply to a message (without sending)",
+    "examples": [
+      "Create a draft reply to this email",
+      "Start a reply but don't send it yet",
+      "Draft a response to this message"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}/createReply",
+    "method": "POST",
+    "scopes": ["Mail.ReadWrite"],
+    "body_template": {
+      "message": {
+        "toRecipients": [
+          {
+            "emailAddress": {
+              "address": "string",
+              "name": "string"
+            }
+          }
+        ]
+      },
+      "comment": "string"
+    },
+    "notes": "Creates a draft reply in the Drafts folder. The toRecipients override is optional. Use /me/messages/{draft_id}/send to send later. The comment field sets the initial reply body.",
+    "tags": ["draft", "reply", "create", "compose", "response", "messages"]
+  },
+  {
+    "id": "mail-create-reply-all-draft",
+    "description": "Create a draft reply-all to a message (without sending)",
+    "examples": [
+      "Create a draft reply all",
+      "Draft a reply to all recipients",
+      "Start a reply all but don't send yet"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}/createReplyAll",
+    "method": "POST",
+    "scopes": ["Mail.ReadWrite"],
+    "body_template": {
+      "comment": "string"
+    },
+    "notes": "Creates a draft reply-all in the Drafts folder. Includes all original toRecipients and ccRecipients. Use /me/messages/{draft_id}/send to send later.",
+    "tags": ["draft", "reply all", "create", "compose", "all recipients", "messages"]
+  },
+  {
+    "id": "mail-create-forward-draft",
+    "description": "Create a draft forward of a message (without sending)",
+    "examples": [
+      "Create a draft forward of this email",
+      "Draft a forwarded message",
+      "Prepare to forward this email but don't send yet"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}/createForward",
+    "method": "POST",
+    "scopes": ["Mail.ReadWrite"],
+    "body_template": {
+      "comment": "string",
+      "toRecipients": [
+        {
+          "emailAddress": {
+            "address": "string",
+            "name": "string"
+          }
+        }
+      ]
+    },
+    "notes": "Creates a draft forward in the Drafts folder. The toRecipients and comment can be set here or added later by updating the draft. Use /me/messages/{draft_id}/send to send later.",
+    "tags": ["draft", "forward", "create", "compose", "fwd", "messages"]
+  },
+  {
+    "id": "mail-list-messages-all",
+    "description": "List messages across all folders (not scoped to inbox)",
+    "examples": [
+      "Show me all my messages across all folders",
+      "List all emails regardless of folder",
+      "Search through all my mail folders"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$top": "25",
+      "$select": "id,subject,from,receivedDateTime,isRead,bodyPreview,parentFolderId",
+      "$orderby": "receivedDateTime desc"
+    },
+    "notes": "Unlike /me/mailFolders/inbox/messages, this endpoint searches across ALL folders. Useful when you don't know which folder a message is in. The parentFolderId tells you which folder each message belongs to.",
+    "tags": ["all", "messages", "all folders", "global", "list", "email"]
+  },
+  {
+    "id": "mail-get-folder",
+    "description": "Get a specific mail folder by ID or well-known name",
+    "examples": [
+      "Get the details of this mail folder",
+      "Show me the inbox folder info",
+      "How many messages are in this folder?"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/{folder_id}",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$select": "id,displayName,parentFolderId,childFolderCount,totalItemCount,unreadItemCount"
+    },
+    "notes": "Can use a folder ID or well-known folder name (inbox, sentitems, drafts, deleteditems, junkemail, archive). Returns totalItemCount and unreadItemCount for quick counts.",
+    "tags": ["folder", "get", "details", "mail folder", "info"]
+  },
+  {
+    "id": "mail-update-folder",
+    "description": "Update a mail folder's properties",
+    "examples": [
+      "Update this mail folder",
+      "Change the display name of this folder",
+      "Modify the properties of a mail folder"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/{folder_id}",
+    "method": "PATCH",
+    "scopes": ["Mail.ReadWrite"],
+    "body_template": {
+      "displayName": "string"
+    },
+    "notes": "Currently only displayName can be updated. Cannot modify well-known folders.",
+    "tags": ["update", "folder", "mail folder", "rename", "modify"]
+  },
+  {
+    "id": "mail-complete-flag",
+    "description": "Mark a flagged email as complete",
+    "examples": [
+      "Mark this flagged email as complete",
+      "Complete the follow-up on this email",
+      "I'm done with this flagged message"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}",
+    "method": "PATCH",
+    "scopes": ["Mail.ReadWrite"],
+    "body_template": {
+      "flag": {
+        "flagStatus": "complete"
+      }
+    },
+    "notes": "Sets the flagStatus to 'complete', which shows a checkmark instead of a flag. The three states are: 'notFlagged', 'flagged', 'complete'.",
+    "tags": ["flag", "complete", "done", "finished", "follow-up", "messages"]
+  },
+  {
+    "id": "mail-filter-flagged",
+    "description": "Filter messages that are flagged for follow-up",
+    "examples": [
+      "Show me my flagged emails",
+      "List flagged messages",
+      "What emails have I flagged?",
+      "Show follow-up items"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$filter": "flag/flagStatus eq 'flagged'",
+      "$top": "25",
+      "$select": "id,subject,from,receivedDateTime,flag,bodyPreview",
+      "$orderby": "receivedDateTime desc"
+    },
+    "notes": "Use flag/flagStatus eq 'flagged' to find flagged items. Use 'complete' to find completed flags. Can be combined with other $filter clauses using 'and'.",
+    "tags": ["flagged", "follow-up", "flag", "filter", "todo", "messages"]
+  },
+  {
+    "id": "mail-filter-has-attachments",
+    "description": "Filter messages that have attachments using $filter",
+    "examples": [
+      "Show me emails with attachments",
+      "List messages that have files attached",
+      "Find emails with attachments in my inbox"
+    ],
+    "service": "mail",
+    "endpoint": "/me/mailFolders/inbox/messages",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$filter": "hasAttachments eq true",
+      "$top": "25",
+      "$select": "id,subject,from,receivedDateTime,hasAttachments,bodyPreview",
+      "$orderby": "receivedDateTime desc"
+    },
+    "notes": "Uses $filter (not $search) to find messages with attachments in a specific folder. Unlike the $search approach, this can be combined with other $filter clauses and $orderby.",
+    "tags": ["attachments", "files", "has attachments", "filter", "messages"]
+  },
+  {
+    "id": "mail-get-message-headers",
+    "description": "Get internet message headers for an email (for troubleshooting delivery issues)",
+    "examples": [
+      "Show me the email headers",
+      "Get the internet headers for this message",
+      "Show message routing information"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "query_params": {
+      "$select": "id,subject,internetMessageHeaders"
+    },
+    "notes": "internetMessageHeaders contains an array of {name, value} objects with SMTP headers. Useful for troubleshooting delivery, verifying SPF/DKIM, or finding the original sender behind forwarded messages.",
+    "tags": ["headers", "internet headers", "SMTP", "routing", "delivery", "troubleshoot", "messages"]
+  },
+  {
+    "id": "mail-get-mime-content",
+    "description": "Get the raw MIME content of an email message",
+    "examples": [
+      "Get the raw MIME content of this email",
+      "Download the .eml file for this message",
+      "Export this email as MIME"
+    ],
+    "service": "mail",
+    "endpoint": "/me/messages/{message_id}/$value",
+    "method": "GET",
+    "scopes": ["Mail.Read"],
+    "notes": "Returns the raw MIME content (RFC 2822 format) of the message. The response Content-Type is application/octet-stream. Useful for exporting emails or processing with other mail tools.",
+    "tags": ["MIME", "raw", "export", "eml", "RFC 2822", "messages"]
+  }
+]

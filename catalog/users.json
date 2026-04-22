@@ -1,0 +1,197 @@
+[
+  {
+    "id": "users-get-my-profile",
+    "description": "Get the current signed-in user's profile information",
+    "examples": [
+      "Show me my profile",
+      "What's my email address?",
+      "Get my user information",
+      "Who am I signed in as?",
+      "Show my account details"
+    ],
+    "service": "users",
+    "endpoint": "/me",
+    "method": "GET",
+    "scopes": ["User.Read"],
+    "query_params": {
+      "$select": "id,displayName,mail,userPrincipalName,jobTitle,department,officeLocation,mobilePhone,businessPhones"
+    },
+    "notes": "The /me endpoint is an alias for /users/{signed-in-user-id}. Only requires User.Read scope. Some properties like employeeId, onPremisesExtensionAttributes may require User.Read.All.",
+    "tags": ["me", "profile", "my info", "account", "user", "identity"]
+  },
+  {
+    "id": "users-get-user",
+    "description": "Get a specific user's profile by user ID or user principal name (UPN/email)",
+    "examples": [
+      "Look up john@contoso.com",
+      "Get the profile for this user",
+      "Show me information about Sarah",
+      "Find user details by email"
+    ],
+    "service": "users",
+    "endpoint": "/users/{user_id_or_upn}",
+    "method": "GET",
+    "scopes": ["User.Read.All"],
+    "query_params": {
+      "$select": "id,displayName,mail,userPrincipalName,jobTitle,department,officeLocation,mobilePhone,businessPhones,accountEnabled"
+    },
+    "notes": "The {user_id_or_upn} can be a user GUID or a userPrincipalName (typically the email address). Requires User.Read.All (delegated) or User.Read.All (application). For guest users, use their full UPN which may differ from their email.",
+    "tags": ["user", "profile", "lookup", "get", "find", "details"]
+  },
+  {
+    "id": "users-search-by-display-name",
+    "description": "Search for users by display name",
+    "examples": [
+      "Search for a user named John Smith",
+      "Find users with 'Sarah' in their name",
+      "Look up people by name",
+      "Who is John in the directory?"
+    ],
+    "service": "users",
+    "endpoint": "/users",
+    "method": "GET",
+    "scopes": ["User.Read.All"],
+    "query_params": {
+      "$filter": "startsWith(displayName, 'search term')",
+      "$top": "25",
+      "$select": "id,displayName,mail,userPrincipalName,jobTitle,department",
+      "$orderby": "displayName"
+    },
+    "notes": "Use startsWith() for prefix matching on displayName. For broader search, use $search=\"displayName:John\" with the ConsistencyLevel=eventual header and $count=true. The $search approach supports partial matching but requires additional headers.",
+    "tags": ["search", "find", "lookup", "users", "directory", "name", "people"]
+  },
+  {
+    "id": "users-get-my-manager",
+    "description": "Get the current user's manager",
+    "examples": [
+      "Who is my manager?",
+      "Show me my boss",
+      "Get my manager's information",
+      "Who do I report to?"
+    ],
+    "service": "users",
+    "endpoint": "/me/manager",
+    "method": "GET",
+    "scopes": ["User.Read.All"],
+    "query_params": {
+      "$select": "id,displayName,mail,userPrincipalName,jobTitle,department"
+    },
+    "notes": "Returns a directoryObject that is typically a user. If no manager is set, returns 404 Not Found. The response @odata.type will be #microsoft.graph.user. Can also use /users/{id}/manager to get another user's manager.",
+    "tags": ["manager", "boss", "supervisor", "reports to", "org chart", "hierarchy"]
+  },
+  {
+    "id": "users-get-my-direct-reports",
+    "description": "Get the current user's direct reports",
+    "examples": [
+      "Who reports to me?",
+      "Show me my direct reports",
+      "List my team members",
+      "Who are my reports?"
+    ],
+    "service": "users",
+    "endpoint": "/me/directReports",
+    "method": "GET",
+    "scopes": ["User.Read.All"],
+    "query_params": {
+      "$select": "id,displayName,mail,userPrincipalName,jobTitle,department",
+      "$top": "100"
+    },
+    "notes": "Returns directoryObjects that are typically users. If the user has no direct reports, returns an empty collection. Can also use /users/{id}/directReports for another user's reports.",
+    "tags": ["direct reports", "team", "reports", "subordinates", "org chart", "hierarchy"]
+  },
+  {
+    "id": "users-get-member-of",
+    "description": "List the groups and directory roles the current user is a member of",
+    "examples": [
+      "What groups am I in?",
+      "List my group memberships",
+      "Show me the teams and groups I belong to",
+      "What groups is my account a member of?"
+    ],
+    "service": "users",
+    "endpoint": "/me/memberOf",
+    "method": "GET",
+    "scopes": ["User.Read", "GroupMember.Read.All"],
+    "query_params": {
+      "$select": "id,displayName,@odata.type",
+      "$top": "100"
+    },
+    "notes": "Returns a mix of groups, directory roles, and administrative units. Filter by @odata.type to get only groups: /me/memberOf/microsoft.graph.group. The results include Microsoft 365 groups, security groups, distribution lists, and directory roles.",
+    "tags": ["groups", "member of", "membership", "teams", "directory", "roles"]
+  },
+  {
+    "id": "users-get-user-photo",
+    "description": "Get a user's profile photo",
+    "examples": [
+      "Get my profile photo",
+      "Show me John's profile picture",
+      "Download the user's photo",
+      "Get the avatar for this user"
+    ],
+    "service": "users",
+    "endpoint": "/me/photo/$value",
+    "method": "GET",
+    "scopes": ["User.Read"],
+    "notes": "Returns the binary image data of the user's profile photo. Response Content-Type is typically image/jpeg. Returns 404 if no photo is set. For another user's photo, use /users/{id}/photo/$value (requires User.Read.All). Use /me/photo for metadata (size, width, height) without the binary content.",
+    "tags": ["photo", "picture", "avatar", "profile photo", "image", "user"]
+  },
+  {
+    "id": "users-list-users",
+    "description": "List users in the organization's directory",
+    "examples": [
+      "List all users in the organization",
+      "Show me the user directory",
+      "Get all users",
+      "Browse the company directory"
+    ],
+    "service": "users",
+    "endpoint": "/users",
+    "method": "GET",
+    "scopes": ["User.Read.All"],
+    "query_params": {
+      "$top": "25",
+      "$select": "id,displayName,mail,userPrincipalName,jobTitle,department,accountEnabled",
+      "$orderby": "displayName",
+      "$filter": "accountEnabled eq true"
+    },
+    "notes": "Returns paginated results. Use $top and @odata.nextLink for paging. Filter by accountEnabled to exclude disabled accounts. For large directories, consider using $filter or $search to narrow results. Maximum $top value is 999.",
+    "tags": ["list", "users", "directory", "all users", "organization", "people"]
+  },
+  {
+    "id": "users-get-user-manager",
+    "description": "Get another user's manager by user ID or UPN",
+    "examples": [
+      "Who is John's manager?",
+      "Show me the manager of this user",
+      "Who does sarah@contoso.com report to?"
+    ],
+    "service": "users",
+    "endpoint": "/users/{user_id_or_upn}/manager",
+    "method": "GET",
+    "scopes": ["User.Read.All"],
+    "query_params": {
+      "$select": "id,displayName,mail,userPrincipalName,jobTitle,department"
+    },
+    "notes": "Returns the specified user's manager as a directoryObject. Returns 404 if no manager is assigned. The {user_id_or_upn} can be a GUID or email/UPN.",
+    "tags": ["manager", "boss", "supervisor", "hierarchy", "user", "org chart"]
+  },
+  {
+    "id": "users-get-user-direct-reports",
+    "description": "Get another user's direct reports by user ID or UPN",
+    "examples": [
+      "Who reports to John?",
+      "Show me Sarah's direct reports",
+      "List the team under this manager"
+    ],
+    "service": "users",
+    "endpoint": "/users/{user_id_or_upn}/directReports",
+    "method": "GET",
+    "scopes": ["User.Read.All"],
+    "query_params": {
+      "$select": "id,displayName,mail,userPrincipalName,jobTitle,department",
+      "$top": "100"
+    },
+    "notes": "Returns the specified user's direct reports. Returns an empty collection if they have no reports. Useful for building org chart views.",
+    "tags": ["direct reports", "team", "reports", "subordinates", "hierarchy", "user", "org chart"]
+  }
+]

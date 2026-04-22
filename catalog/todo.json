@@ -1,0 +1,349 @@
+[
+  {
+    "id": "todo-list-all-task-lists",
+    "description": "List all Microsoft To Do task lists for the current user",
+    "examples": [
+      "Show me all my to-do lists",
+      "What task lists do I have?",
+      "List my To Do lists"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists",
+    "method": "GET",
+    "scopes": ["Tasks.Read", "Tasks.ReadWrite"],
+    "tags": ["task-list", "list", "read"]
+  },
+  {
+    "id": "todo-get-task-list",
+    "description": "Get a specific Microsoft To Do task list by its ID",
+    "examples": [
+      "Get my 'Work' task list",
+      "Show me the details of task list {listId}",
+      "Open my grocery list"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists/{listId}",
+    "method": "GET",
+    "scopes": ["Tasks.Read", "Tasks.ReadWrite"],
+    "tags": ["task-list", "read"]
+  },
+  {
+    "id": "todo-create-task-list",
+    "description": "Create a new Microsoft To Do task list",
+    "examples": [
+      "Create a new to-do list called 'Groceries'",
+      "Make a new task list named 'Project Alpha'",
+      "Add a to-do list for vacation planning"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists",
+    "method": "POST",
+    "scopes": ["Tasks.ReadWrite"],
+    "body_template": {
+      "displayName": "{{listName}}"
+    },
+    "tags": ["task-list", "create"]
+  },
+  {
+    "id": "todo-update-task-list",
+    "description": "Update (rename) an existing Microsoft To Do task list",
+    "examples": [
+      "Rename my 'Groceries' list to 'Shopping'",
+      "Change the name of task list {listId}",
+      "Update my to-do list name"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists/{listId}",
+    "method": "PATCH",
+    "scopes": ["Tasks.ReadWrite"],
+    "body_template": {
+      "displayName": "{{newListName}}"
+    },
+    "tags": ["task-list", "update"]
+  },
+  {
+    "id": "todo-delete-task-list",
+    "description": "Delete a Microsoft To Do task list",
+    "examples": [
+      "Delete my 'Old Projects' list",
+      "Remove task list {listId}",
+      "Get rid of my shopping list"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists/{listId}",
+    "method": "DELETE",
+    "scopes": ["Tasks.ReadWrite"],
+    "tags": ["task-list", "delete"]
+  },
+  {
+    "id": "todo-list-tasks",
+    "description": "List all tasks in a specific Microsoft To Do task list",
+    "examples": [
+      "Show me all tasks in my 'Work' list",
+      "What tasks are in my grocery list?",
+      "List tasks in list {listId}"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists/{listId}/tasks",
+    "method": "GET",
+    "scopes": ["Tasks.Read", "Tasks.ReadWrite"],
+    "tags": ["task", "list", "read"]
+  },
+  {
+    "id": "todo-list-incomplete-tasks",
+    "description": "List only incomplete (not completed) tasks in a To Do task list",
+    "examples": [
+      "Show me incomplete tasks in my work list",
+      "What tasks haven't I finished yet?",
+      "List tasks I still need to do"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists/{listId}/tasks",
+    "method": "GET",
+    "scopes": ["Tasks.Read", "Tasks.ReadWrite"],
+    "query_params": {
+      "$filter": "status ne 'completed'"
+    },
+    "notes": "Filter incomplete tasks with $filter=status ne 'completed'",
+    "tags": ["task", "list", "read", "filter", "incomplete"]
+  },
+  {
+    "id": "todo-list-tasks-due-today",
+    "description": "List tasks that are due today in a To Do task list",
+    "examples": [
+      "What tasks are due today?",
+      "Show me today's tasks",
+      "What do I need to finish today?"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists/{listId}/tasks",
+    "method": "GET",
+    "scopes": ["Tasks.Read", "Tasks.ReadWrite"],
+    "query_params": {
+      "$filter": "dueDateTime/dateTime ge '{{todayStart}}' and dueDateTime/dateTime lt '{{tomorrowStart}}'"
+    },
+    "notes": "Due dates use the dateTimeTimeZone format: { dateTime: '2024-01-15T00:00:00', timeZone: 'UTC' }. Replace {{todayStart}} and {{tomorrowStart}} with the actual ISO date strings for today and tomorrow.",
+    "tags": ["task", "list", "read", "filter", "due-today"]
+  },
+  {
+    "id": "todo-list-overdue-tasks",
+    "description": "List tasks that are past their due date in a To Do task list",
+    "examples": [
+      "What tasks are overdue?",
+      "Show me tasks I missed the deadline for",
+      "List past-due tasks"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists/{listId}/tasks",
+    "method": "GET",
+    "scopes": ["Tasks.Read", "Tasks.ReadWrite"],
+    "query_params": {
+      "$filter": "dueDateTime/dateTime lt '{{now}}' and status ne 'completed'"
+    },
+    "notes": "Replace {{now}} with the current ISO datetime. Combine with status filter to exclude already-completed tasks.",
+    "tags": ["task", "list", "read", "filter", "overdue"]
+  },
+  {
+    "id": "todo-get-task",
+    "description": "Get a specific task from a Microsoft To Do task list",
+    "examples": [
+      "Show me the details of task {taskId}",
+      "Get my 'Buy milk' task",
+      "What are the details of that task?"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists/{listId}/tasks/{taskId}",
+    "method": "GET",
+    "scopes": ["Tasks.Read", "Tasks.ReadWrite"],
+    "tags": ["task", "read"]
+  },
+  {
+    "id": "todo-create-task-basic",
+    "description": "Create a new task with just a title in a To Do task list",
+    "examples": [
+      "Add 'Buy milk' to my grocery list",
+      "Create a task to call the dentist",
+      "Add a reminder to pick up dry cleaning"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists/{listId}/tasks",
+    "method": "POST",
+    "scopes": ["Tasks.ReadWrite"],
+    "body_template": {
+      "title": "{{taskTitle}}"
+    },
+    "tags": ["task", "create"]
+  },
+  {
+    "id": "todo-create-task-detailed",
+    "description": "Create a new task with a due date, body content, and importance level in a To Do task list",
+    "examples": [
+      "Create a task 'Submit report' due Friday with high importance",
+      "Add a task with notes and a deadline",
+      "Create a detailed task in my work list"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists/{listId}/tasks",
+    "method": "POST",
+    "scopes": ["Tasks.ReadWrite"],
+    "body_template": {
+      "title": "{{taskTitle}}",
+      "body": {
+        "content": "{{bodyContent}}",
+        "contentType": "text"
+      },
+      "dueDateTime": {
+        "dateTime": "{{dueDate}}",
+        "timeZone": "UTC"
+      },
+      "importance": "{{importance}}"
+    },
+    "notes": "Due dates use the dateTimeTimeZone format: { dateTime: '2024-01-15T00:00:00', timeZone: 'UTC' }. Importance values: low, normal, high.",
+    "tags": ["task", "create", "due-date", "importance", "body"]
+  },
+  {
+    "id": "todo-update-task",
+    "description": "Update a task's title, body, due date, or importance in a To Do task list",
+    "examples": [
+      "Change the due date of my 'Submit report' task",
+      "Update the title of task {taskId}",
+      "Set importance to high for that task"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists/{listId}/tasks/{taskId}",
+    "method": "PATCH",
+    "scopes": ["Tasks.ReadWrite"],
+    "body_template": {
+      "title": "{{taskTitle}}",
+      "body": {
+        "content": "{{bodyContent}}",
+        "contentType": "text"
+      },
+      "dueDateTime": {
+        "dateTime": "{{dueDate}}",
+        "timeZone": "UTC"
+      },
+      "importance": "{{importance}}"
+    },
+    "notes": "Include only the fields you want to update. Due dates use the dateTimeTimeZone format: { dateTime: '2024-01-15T00:00:00', timeZone: 'UTC' }. Importance values: low, normal, high.",
+    "tags": ["task", "update"]
+  },
+  {
+    "id": "todo-complete-task",
+    "description": "Mark a task as completed in a To Do task list",
+    "examples": [
+      "Mark 'Buy milk' as done",
+      "Complete the task {taskId}",
+      "I finished the 'Submit report' task"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists/{listId}/tasks/{taskId}",
+    "method": "PATCH",
+    "scopes": ["Tasks.ReadWrite"],
+    "body_template": {
+      "status": "completed",
+      "completedDateTime": {
+        "dateTime": "{{completedDateTime}}",
+        "timeZone": "UTC"
+      }
+    },
+    "notes": "The completedDateTime must include a timeZone object when completing a task. Set dateTime to the current ISO timestamp.",
+    "tags": ["task", "update", "complete"]
+  },
+  {
+    "id": "todo-reopen-task",
+    "description": "Reopen a completed task by setting its status back to notStarted",
+    "examples": [
+      "Reopen the 'Buy milk' task",
+      "Mark that task as not done",
+      "Un-complete task {taskId}"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists/{listId}/tasks/{taskId}",
+    "method": "PATCH",
+    "scopes": ["Tasks.ReadWrite"],
+    "body_template": {
+      "status": "notStarted",
+      "completedDateTime": null
+    },
+    "tags": ["task", "update", "reopen"]
+  },
+  {
+    "id": "todo-delete-task",
+    "description": "Delete a task from a Microsoft To Do task list",
+    "examples": [
+      "Delete the 'Buy milk' task",
+      "Remove task {taskId} from my list",
+      "Get rid of that task"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists/{listId}/tasks/{taskId}",
+    "method": "DELETE",
+    "scopes": ["Tasks.ReadWrite"],
+    "tags": ["task", "delete"]
+  },
+  {
+    "id": "todo-list-checklist-items",
+    "description": "List all checklist items (subtasks) on a To Do task",
+    "examples": [
+      "Show me the checklist items on task {taskId}",
+      "What subtasks does this task have?",
+      "List the checklist for my 'Pack for trip' task"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists/{listId}/tasks/{taskId}/checklistItems",
+    "method": "GET",
+    "scopes": ["Tasks.Read", "Tasks.ReadWrite"],
+    "tags": ["checklist", "list", "read"]
+  },
+  {
+    "id": "todo-create-checklist-item",
+    "description": "Create a new checklist item (subtask) on a To Do task",
+    "examples": [
+      "Add a checklist item 'Pack shoes' to my packing task",
+      "Create a subtask under task {taskId}",
+      "Add a step to my task"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists/{listId}/tasks/{taskId}/checklistItems",
+    "method": "POST",
+    "scopes": ["Tasks.ReadWrite"],
+    "body_template": {
+      "displayName": "{{itemName}}"
+    },
+    "tags": ["checklist", "create"]
+  },
+  {
+    "id": "todo-update-checklist-item",
+    "description": "Update a checklist item on a To Do task (toggle checked/unchecked or rename)",
+    "examples": [
+      "Check off 'Pack shoes' from the checklist",
+      "Mark checklist item as done",
+      "Uncheck the first checklist item"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists/{listId}/tasks/{taskId}/checklistItems/{checklistItemId}",
+    "method": "PATCH",
+    "scopes": ["Tasks.ReadWrite"],
+    "body_template": {
+      "isChecked": "{{isChecked}}",
+      "displayName": "{{itemName}}"
+    },
+    "notes": "Set isChecked to true to mark complete, false to uncheck. Include only the fields you want to update.",
+    "tags": ["checklist", "update"]
+  },
+  {
+    "id": "todo-delete-checklist-item",
+    "description": "Delete a checklist item from a To Do task",
+    "examples": [
+      "Remove 'Pack shoes' from the checklist",
+      "Delete checklist item {checklistItemId}",
+      "Remove that subtask"
+    ],
+    "service": "todo",
+    "endpoint": "/me/todo/lists/{listId}/tasks/{taskId}/checklistItems/{checklistItemId}",
+    "method": "DELETE",
+    "scopes": ["Tasks.ReadWrite"],
+    "tags": ["checklist", "delete"]
+  }
+]
