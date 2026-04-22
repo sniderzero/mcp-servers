@@ -1,0 +1,7 @@
+node_modules/
+build/
+release/
+bundle.cjs
+.env
+.omc/
+.DS_Store
