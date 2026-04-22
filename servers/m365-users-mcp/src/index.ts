@@ -4,7 +4,17 @@ import { OAuthProvider, doBrowserAuth, GRAPH_SCOPES } from "./auth/oauthAuth.js"
 import { registerUserTools } from "./tools/users/index.js";
 
 async function main() {
+  if (!(process as unknown as { pkg?: unknown }).pkg) {
+    await import("dotenv/config");
+  }
+
   const subcommand = process.argv[2];
+
+  if (subcommand === "setup") {
+    const { runSetup } = await import("./setup.js");
+    await runSetup();
+    process.exit(0);
+  }
 
   if (subcommand === "--auth") {
     process.stderr.write("[M365 Users] Starting authentication...\n");
