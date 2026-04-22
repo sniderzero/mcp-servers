@@ -1,0 +1,11 @@
+node_modules/
+dist/
+build/
+release/
+bundle.cjs
+*.zip
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
