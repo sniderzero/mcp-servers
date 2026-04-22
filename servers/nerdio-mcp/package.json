@@ -1,0 +1,35 @@
+{
+  "name": "nerdio-mcp",
+  "version": "1.0.0",
+  "description": "Nerdio Manager for Enterprise MCP server",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "bundle": "node build.mjs",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "package": "npm run bundle && npm run package:mac-arm64 && npm run package:mac-x64 && npm run package:win",
+    "package:mac-arm64": "pkg dist/nerdio-mcp.cjs -t node20-macos-arm64 -o release/nerdio-mcp-macos-arm64 -C GZip",
+    "package:mac-x64": "pkg dist/nerdio-mcp.cjs -t node20-macos-x64 -o release/nerdio-mcp-macos-x64 -C GZip",
+    "package:win": "pkg dist/nerdio-mcp.cjs -t node20-win-x64 -o release/nerdio-mcp-win-x64.exe -C GZip"
+  },
+  "pkg": {
+    "targets": ["node20"],
+    "assets": []
+  },
+  "dependencies": {
+    "@azure/msal-node": "^2.16.2",
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "dotenv": "^16.4.7",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@yao-pkg/pkg": "^6.14.2",
+    "esbuild": "^0.24.0",
+    "tsx": "^4.19.0",
+    "typescript": "~5.6.0"
+  }
+}
