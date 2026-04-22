@@ -13,6 +13,12 @@ function getInstallPath(): string {
 
 function getClaudeDesktopConfigPath(): string {
   if (process.platform === "win32") {
+    const storePath = join(
+      process.env.LOCALAPPDATA ?? join(homedir(), "AppData", "Local"),
+      "Packages", "Claude_pzs8sxrjxfjjc", "LocalCache", "Roaming", "Claude",
+      "claude_desktop_config.json"
+    );
+    if (existsSync(dirname(storePath))) return storePath;
     const appData = process.env.APPDATA ?? join(homedir(), "AppData", "Roaming");
     return join(appData, "Claude", "claude_desktop_config.json");
   }

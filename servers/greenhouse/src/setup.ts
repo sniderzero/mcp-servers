@@ -18,7 +18,16 @@ function getClaudeDesktopConfigs(): string[] {
   if (platform() === "darwin") {
     configs.push(join(home, "Library", "Application Support", "Claude", "claude_desktop_config.json"));
   } else if (platform() === "win32") {
-    configs.push(join(process.env.APPDATA ?? join(home, "AppData", "Roaming"), "Claude", "claude_desktop_config.json"));
+    const storePath = join(
+      process.env.LOCALAPPDATA ?? join(home, "AppData", "Local"),
+      "Packages", "Claude_pzs8sxrjxfjjc", "LocalCache", "Roaming", "Claude",
+      "claude_desktop_config.json"
+    );
+    if (existsSync(dirname(storePath))) {
+      configs.push(storePath);
+    } else {
+      configs.push(join(process.env.APPDATA ?? join(home, "AppData", "Roaming"), "Claude", "claude_desktop_config.json"));
+    }
   } else {
     configs.push(join(home, ".config", "Claude", "claude_desktop_config.json"));
   }
