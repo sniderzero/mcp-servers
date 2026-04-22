@@ -8,10 +8,23 @@
   },
   "scripts": {
     "build": "tsc",
+    "bundle": "node build.mjs",
     "build:embeddings": "npx tsx scripts/build-embeddings.ts",
     "start": "node build/index.js",
     "dev": "tsc --watch",
-    "inspect": "npx @modelcontextprotocol/inspector node build/index.js"
+    "typecheck": "tsc --noEmit",
+    "inspect": "npx @modelcontextprotocol/inspector node build/index.js",
+    "package": "npm run bundle && npm run package:mac-arm64 && npm run package:win",
+    "package:mac-arm64": "npx @yao-pkg/pkg dist/m365-mcp.cjs -t node20-macos-arm64 -o release/m365-mcp-macos-arm64 --compress GZip",
+    "package:win": "npx @yao-pkg/pkg dist/m365-mcp.cjs -t node20-win-x64 -o release/m365-mcp-win-x64.exe --compress GZip"
+  },
+  "pkg": {
+    "targets": [
+      "node20-macos-arm64",
+      "node20-win-x64"
+    ],
+    "outputPath": "release",
+    "assets": ["catalog/**/*"]
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
@@ -23,6 +36,8 @@
   "devDependencies": {
     "@microsoft/microsoft-graph-types": "^2.40.0",
     "@types/node": "^22.0.0",
+    "@yao-pkg/pkg": "^6.14.2",
+    "esbuild": "^0.24.0",
     "tsx": "^4.19.0",
     "typescript": "^5.7.0"
   },

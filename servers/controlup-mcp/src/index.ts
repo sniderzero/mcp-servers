@@ -28,8 +28,15 @@ async function main(): Promise<void> {
   }
 
   const auth = new ApiKeyAuthProvider(requireEnv("CONTROLUP_API_KEY"));
-  const baseUrl = process.env["CONTROLUP_BASE_URL"] || "https://api.controlup.com";
-  const client = new ControlUpClient(baseUrl, auth, requireEnv("CONTROLUP_ORG_ID"));
+  // CONTROLUP_ORG_ID and CONTROLUP_BASE_URL are replaced at build time by esbuild define
+  // so dot-notation access is required here (bracket notation via variable won't be replaced)
+  const orgId = process.env.CONTROLUP_ORG_ID;
+  if (!orgId) {
+    process.stderr.write("[controlup-mcp] Missing required env var: CONTROLUP_ORG_ID\n");
+    process.exit(1);
+  }
+  const baseUrl = process.env.CONTROLUP_BASE_URL || "https://api.controlup.com";
+  const client = new ControlUpClient(baseUrl, auth, orgId);
 
   const server = createServer(client);
   const transport = new StdioServerTransport();

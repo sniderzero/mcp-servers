@@ -16,6 +16,16 @@ const ask = (q) => new Promise((resolve) => rl.question(q, resolve));
 
 function getClaudeConfigPath() {
   if (process.platform === "win32") {
+    const storePath = path.join(
+      process.env.LOCALAPPDATA,
+      "Packages",
+      "Claude_pzs8sxrjxfjjc",
+      "LocalCache",
+      "Roaming",
+      "Claude",
+      "claude_desktop_config.json"
+    );
+    if (fs.existsSync(path.dirname(storePath))) return storePath;
     return path.join(process.env.APPDATA, "Claude", "claude_desktop_config.json");
   }
   return path.join(os.homedir(), "Library", "Application Support", "Claude", "claude_desktop_config.json");

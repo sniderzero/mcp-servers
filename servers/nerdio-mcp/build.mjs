@@ -1,9 +1,11 @@
 import { build } from "esbuild";
-import { readFileSync } from "fs";
+import { readFileSync, existsSync } from "fs";
 
 function loadBuildConfig() {
-  const lines = readFileSync(".env", "utf-8").split("\n");
   const config = {};
+  const envFile = existsSync(".env.local") ? ".env.local" : existsSync(".env") ? ".env" : null;
+  if (!envFile) return config;
+  const lines = readFileSync(envFile, "utf-8").split("\n");
   for (const line of lines) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith("#")) continue;
