@@ -1,0 +1,21 @@
+{
+  "manifest_version": "0.2",
+  "name": "m365-planner",
+  "version": "1.0.0",
+  "description": "Microsoft 365 Planner MCP server — manage plans, tasks, buckets, assignments, and Dataverse Project Operations via Microsoft Graph API",
+  "author": {
+    "name": "Ascend Partner Services"
+  },
+  "server": {
+    "type": "node",
+    "entry_point": "server/planner-mcp.cjs",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/server/planner-mcp.cjs"
+      ],
+      "env": {}
+    }
+  },
+  "license": "MIT"
+}
