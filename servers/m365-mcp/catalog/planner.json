@@ -1,0 +1,338 @@
+[
+  {
+    "id": "planner-list-my-plans",
+    "description": "List all Planner plans that the current user is a member of",
+    "examples": [
+      "Show me all my Planner plans",
+      "What plans do I have in Planner?",
+      "List my plans"
+    ],
+    "service": "planner",
+    "endpoint": "/me/planner/plans",
+    "method": "GET",
+    "scopes": ["Tasks.Read", "Tasks.ReadWrite", "Group.Read.All"],
+    "notes": "Plans are owned by Microsoft 365 Groups -- the owner field is a group ID.",
+    "tags": ["plan", "list", "read"]
+  },
+  {
+    "id": "planner-get-plan",
+    "description": "Get a specific Planner plan by its ID",
+    "examples": [
+      "Show me the details of plan {planId}",
+      "Get my 'Sprint 42' plan",
+      "Open the project plan"
+    ],
+    "service": "planner",
+    "endpoint": "/planner/plans/{planId}",
+    "method": "GET",
+    "scopes": ["Tasks.Read", "Tasks.ReadWrite", "Group.Read.All"],
+    "notes": "Plans are owned by Microsoft 365 Groups -- the owner field is a group ID.",
+    "tags": ["plan", "read"]
+  },
+  {
+    "id": "planner-get-plan-details",
+    "description": "Get the details of a Planner plan including category descriptions",
+    "examples": [
+      "Show me the plan details for plan {planId}",
+      "What are the category labels for this plan?",
+      "Get the full details of the project plan"
+    ],
+    "service": "planner",
+    "endpoint": "/planner/plans/{planId}/details",
+    "method": "GET",
+    "scopes": ["Tasks.Read", "Tasks.ReadWrite", "Group.Read.All"],
+    "tags": ["plan", "details", "read"]
+  },
+  {
+    "id": "planner-list-buckets",
+    "description": "List all buckets in a Planner plan",
+    "examples": [
+      "Show me the buckets in plan {planId}",
+      "What columns does my plan have?",
+      "List buckets for the project plan"
+    ],
+    "service": "planner",
+    "endpoint": "/planner/plans/{planId}/buckets",
+    "method": "GET",
+    "scopes": ["Tasks.Read", "Tasks.ReadWrite", "Group.Read.All"],
+    "tags": ["bucket", "list", "read"]
+  },
+  {
+    "id": "planner-create-bucket",
+    "description": "Create a new bucket in a Planner plan",
+    "examples": [
+      "Create a bucket called 'In Progress' in my plan",
+      "Add a new column named 'Backlog' to the plan",
+      "Make a bucket for 'Testing'"
+    ],
+    "service": "planner",
+    "endpoint": "/planner/buckets",
+    "method": "POST",
+    "scopes": ["Tasks.ReadWrite", "Group.ReadWrite.All"],
+    "body_template": {
+      "name": "{{bucketName}}",
+      "planId": "{{planId}}",
+      "orderHint": " !"
+    },
+    "tags": ["bucket", "create"]
+  },
+  {
+    "id": "planner-update-bucket",
+    "description": "Update (rename) a Planner bucket",
+    "examples": [
+      "Rename the 'To Do' bucket to 'Backlog'",
+      "Change the bucket name to 'In Review'",
+      "Update bucket {bucketId} name"
+    ],
+    "service": "planner",
+    "endpoint": "/planner/buckets/{bucketId}",
+    "method": "PATCH",
+    "scopes": ["Tasks.ReadWrite", "Group.ReadWrite.All"],
+    "body_template": {
+      "name": "{{bucketName}}"
+    },
+    "notes": "ALL PATCH operations require an If-Match header with the ETag from a prior GET request. Get the ETag from the @odata.etag property of the bucket object.",
+    "tags": ["bucket", "update"]
+  },
+  {
+    "id": "planner-delete-bucket",
+    "description": "Delete a bucket from a Planner plan",
+    "examples": [
+      "Delete the 'Archive' bucket",
+      "Remove bucket {bucketId}",
+      "Get rid of the 'Old Items' column"
+    ],
+    "service": "planner",
+    "endpoint": "/planner/buckets/{bucketId}",
+    "method": "DELETE",
+    "scopes": ["Tasks.ReadWrite", "Group.ReadWrite.All"],
+    "notes": "ALL DELETE operations on Planner resources require an If-Match header with the ETag from a prior GET request.",
+    "tags": ["bucket", "delete"]
+  },
+  {
+    "id": "planner-list-plan-tasks",
+    "description": "List all tasks in a Planner plan",
+    "examples": [
+      "Show me all tasks in the project plan",
+      "List tasks in plan {planId}",
+      "What tasks are in this plan?"
+    ],
+    "service": "planner",
+    "endpoint": "/planner/plans/{planId}/tasks",
+    "method": "GET",
+    "scopes": ["Tasks.Read", "Tasks.ReadWrite", "Group.Read.All"],
+    "tags": ["task", "list", "read"]
+  },
+  {
+    "id": "planner-list-bucket-tasks",
+    "description": "List all tasks in a specific Planner bucket",
+    "examples": [
+      "Show me tasks in the 'In Progress' bucket",
+      "What tasks are in bucket {bucketId}?",
+      "List items in the 'To Do' column"
+    ],
+    "service": "planner",
+    "endpoint": "/planner/buckets/{bucketId}/tasks",
+    "method": "GET",
+    "scopes": ["Tasks.Read", "Tasks.ReadWrite", "Group.Read.All"],
+    "tags": ["task", "list", "read", "bucket"]
+  },
+  {
+    "id": "planner-get-task",
+    "description": "Get a specific Planner task by its ID",
+    "examples": [
+      "Show me the details of Planner task {taskId}",
+      "Get the 'Design mockups' task",
+      "What are the details of that Planner task?"
+    ],
+    "service": "planner",
+    "endpoint": "/planner/tasks/{taskId}",
+    "method": "GET",
+    "scopes": ["Tasks.Read", "Tasks.ReadWrite", "Group.Read.All"],
+    "notes": "The response includes the @odata.etag property needed for any subsequent PATCH or DELETE operations.",
+    "tags": ["task", "read"]
+  },
+  {
+    "id": "planner-get-task-details",
+    "description": "Get the details of a Planner task including its description and checklist items",
+    "examples": [
+      "Show me the description and checklist for task {taskId}",
+      "Get the full details of that Planner task",
+      "What's in the checklist for this task?"
+    ],
+    "service": "planner",
+    "endpoint": "/planner/tasks/{taskId}/details",
+    "method": "GET",
+    "scopes": ["Tasks.Read", "Tasks.ReadWrite", "Group.Read.All"],
+    "notes": "Task details (description, checklist) are at a separate endpoint: /planner/tasks/{id}/details. The checklist is a dictionary keyed by GUIDs.",
+    "tags": ["task", "details", "read", "checklist", "description"]
+  },
+  {
+    "id": "planner-create-task",
+    "description": "Create a new task in a Planner plan and bucket",
+    "examples": [
+      "Create a task called 'Design homepage' in the project plan",
+      "Add a Planner task to the 'To Do' bucket",
+      "Make a new task in plan {planId}"
+    ],
+    "service": "planner",
+    "endpoint": "/planner/tasks",
+    "method": "POST",
+    "scopes": ["Tasks.ReadWrite", "Group.ReadWrite.All"],
+    "body_template": {
+      "planId": "{{planId}}",
+      "bucketId": "{{bucketId}}",
+      "title": "{{taskTitle}}"
+    },
+    "tags": ["task", "create"]
+  },
+  {
+    "id": "planner-create-task-detailed",
+    "description": "Create a new Planner task with assignments and a due date",
+    "examples": [
+      "Create a Planner task 'Write proposal' assigned to John due next Friday",
+      "Add a task with assignments and a deadline",
+      "Create a task assigned to {userId} in the project plan"
+    ],
+    "service": "planner",
+    "endpoint": "/planner/tasks",
+    "method": "POST",
+    "scopes": ["Tasks.ReadWrite", "Group.ReadWrite.All"],
+    "body_template": {
+      "planId": "{{planId}}",
+      "bucketId": "{{bucketId}}",
+      "title": "{{taskTitle}}",
+      "assignments": {
+        "{{userId}}": {
+          "@odata.type": "#microsoft.graph.plannerAssignment",
+          "orderHint": " !"
+        }
+      },
+      "dueDateTime": "{{dueDateTime}}"
+    },
+    "notes": "Assignments use a userId-keyed object: { assignments: { 'user-id': { '@odata.type': '#microsoft.graph.plannerAssignment', 'orderHint': ' !' } } }. dueDateTime is an ISO 8601 string (e.g., '2024-01-15T00:00:00Z').",
+    "tags": ["task", "create", "assignments", "due-date"]
+  },
+  {
+    "id": "planner-update-task",
+    "description": "Update a Planner task's title, due date, progress, or bucket",
+    "examples": [
+      "Change the due date of Planner task {taskId}",
+      "Move the task to the 'In Progress' bucket",
+      "Update the title of the Planner task"
+    ],
+    "service": "planner",
+    "endpoint": "/planner/tasks/{taskId}",
+    "method": "PATCH",
+    "scopes": ["Tasks.ReadWrite", "Group.ReadWrite.All"],
+    "body_template": {
+      "title": "{{taskTitle}}",
+      "dueDateTime": "{{dueDateTime}}",
+      "percentComplete": "{{percentComplete}}",
+      "bucketId": "{{bucketId}}"
+    },
+    "notes": "ALL PATCH operations require an If-Match header with the ETag from a prior GET request. Get the ETag from the @odata.etag property of the task object. Include only the fields you want to update. percentComplete values: 0 (not started), 25, 50, 75, 100 (complete).",
+    "tags": ["task", "update"]
+  },
+  {
+    "id": "planner-complete-task",
+    "description": "Mark a Planner task as complete by setting percentComplete to 100",
+    "examples": [
+      "Complete the 'Design mockups' Planner task",
+      "Mark Planner task {taskId} as done",
+      "Set the task to 100% complete"
+    ],
+    "service": "planner",
+    "endpoint": "/planner/tasks/{taskId}",
+    "method": "PATCH",
+    "scopes": ["Tasks.ReadWrite", "Group.ReadWrite.All"],
+    "body_template": {
+      "percentComplete": 100
+    },
+    "notes": "ALL PATCH operations require an If-Match header with the ETag from a prior GET request. Get the ETag from the @odata.etag property of the task object. percentComplete values: 0 (not started), 25, 50, 75, 100 (complete).",
+    "tags": ["task", "update", "complete"]
+  },
+  {
+    "id": "planner-update-task-details",
+    "description": "Update the details of a Planner task including description and checklist items",
+    "examples": [
+      "Add a description to Planner task {taskId}",
+      "Update the checklist on my Planner task",
+      "Set the task description to 'Review all PR comments'"
+    ],
+    "service": "planner",
+    "endpoint": "/planner/tasks/{taskId}/details",
+    "method": "PATCH",
+    "scopes": ["Tasks.ReadWrite", "Group.ReadWrite.All"],
+    "body_template": {
+      "description": "{{description}}",
+      "checklist": {
+        "{{guid}}": {
+          "@odata.type": "#microsoft.graph.plannerChecklistItem",
+          "title": "{{checklistItemTitle}}",
+          "isChecked": false
+        }
+      }
+    },
+    "notes": "Task details (description, checklist) are at a separate endpoint: /planner/tasks/{id}/details. ALL PATCH operations require an If-Match header with the ETag from a prior GET on the task details. Checklist items are keyed by GUIDs that you generate.",
+    "tags": ["task", "details", "update", "description", "checklist"]
+  },
+  {
+    "id": "planner-delete-task",
+    "description": "Delete a Planner task",
+    "examples": [
+      "Delete Planner task {taskId}",
+      "Remove the 'Old design' task from the plan",
+      "Get rid of that Planner task"
+    ],
+    "service": "planner",
+    "endpoint": "/planner/tasks/{taskId}",
+    "method": "DELETE",
+    "scopes": ["Tasks.ReadWrite", "Group.ReadWrite.All"],
+    "notes": "ALL DELETE operations require an If-Match header with the ETag from a prior GET request. Get the ETag from the @odata.etag property of the task object.",
+    "tags": ["task", "delete"]
+  },
+  {
+    "id": "planner-assign-task",
+    "description": "Assign a Planner task to a user",
+    "examples": [
+      "Assign task {taskId} to John",
+      "Add {userId} to the task",
+      "Give this task to Sarah"
+    ],
+    "service": "planner",
+    "endpoint": "/planner/tasks/{taskId}",
+    "method": "PATCH",
+    "scopes": ["Tasks.ReadWrite", "Group.ReadWrite.All"],
+    "body_template": {
+      "assignments": {
+        "{{userId}}": {
+          "@odata.type": "#microsoft.graph.plannerAssignment",
+          "orderHint": " !"
+        }
+      }
+    },
+    "notes": "ALL PATCH operations require an If-Match header with the ETag from a prior GET request. Assignments use a userId-keyed object: { assignments: { 'user-id': { '@odata.type': '#microsoft.graph.plannerAssignment', 'orderHint': ' !' } } }. New assignments are merged with existing ones.",
+    "tags": ["task", "update", "assign"]
+  },
+  {
+    "id": "planner-unassign-task",
+    "description": "Remove a user's assignment from a Planner task",
+    "examples": [
+      "Unassign John from task {taskId}",
+      "Remove {userId} from the task",
+      "Take Sarah off this task"
+    ],
+    "service": "planner",
+    "endpoint": "/planner/tasks/{taskId}",
+    "method": "PATCH",
+    "scopes": ["Tasks.ReadWrite", "Group.ReadWrite.All"],
+    "body_template": {
+      "assignments": {
+        "{{userId}}": null
+      }
+    },
+    "notes": "ALL PATCH operations require an If-Match header with the ETag from a prior GET request. Set the user's assignment to null to unassign them.",
+    "tags": ["task", "update", "unassign"]
+  }
+]

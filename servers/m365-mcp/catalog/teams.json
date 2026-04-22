@@ -1,0 +1,520 @@
+[
+  {
+    "id": "teams-list-joined",
+    "description": "List all teams the current user has joined",
+    "examples": [
+      "What teams am I in?",
+      "List my teams",
+      "Show me all my joined teams"
+    ],
+    "service": "teams",
+    "endpoint": "/me/joinedTeams",
+    "method": "GET",
+    "scopes": ["Team.ReadBasic.All"],
+    "query_params": {
+      "$select": "id,displayName,description",
+      "$top": 50
+    },
+    "tags": ["teams", "list", "membership"]
+  },
+  {
+    "id": "teams-get-team",
+    "description": "Get details of a specific team by its ID",
+    "examples": [
+      "Get info about team {id}",
+      "Show me team details",
+      "What is the description of team X?"
+    ],
+    "service": "teams",
+    "endpoint": "/teams/{team-id}",
+    "method": "GET",
+    "scopes": ["Team.ReadBasic.All"],
+    "tags": ["teams", "get", "details"]
+  },
+  {
+    "id": "teams-list-members",
+    "description": "List all members of a specific team",
+    "examples": [
+      "Who is in team X?",
+      "List team members",
+      "Show members of the engineering team"
+    ],
+    "service": "teams",
+    "endpoint": "/teams/{team-id}/members",
+    "method": "GET",
+    "scopes": ["TeamMember.Read.All"],
+    "tags": ["teams", "members", "list"]
+  },
+  {
+    "id": "teams-get-member",
+    "description": "Get details about a specific team member",
+    "examples": [
+      "Get member info for user X in team Y",
+      "What role does this person have in the team?"
+    ],
+    "service": "teams",
+    "endpoint": "/teams/{team-id}/members/{membership-id}",
+    "method": "GET",
+    "scopes": ["TeamMember.Read.All"],
+    "tags": ["teams", "members", "get"]
+  },
+  {
+    "id": "teams-list-channels",
+    "description": "List all channels in a team",
+    "examples": [
+      "What channels are in team X?",
+      "List channels for the marketing team",
+      "Show me all channels"
+    ],
+    "service": "teams",
+    "endpoint": "/teams/{team-id}/channels",
+    "method": "GET",
+    "scopes": ["Channel.ReadBasic.All"],
+    "query_params": {
+      "$select": "id,displayName,description,membershipType"
+    },
+    "tags": ["teams", "channels", "list"]
+  },
+  {
+    "id": "teams-get-channel",
+    "description": "Get details of a specific channel in a team",
+    "examples": [
+      "Get info about channel X in team Y",
+      "Show channel details"
+    ],
+    "service": "teams",
+    "endpoint": "/teams/{team-id}/channels/{channel-id}",
+    "method": "GET",
+    "scopes": ["Channel.ReadBasic.All"],
+    "tags": ["teams", "channels", "get"]
+  },
+  {
+    "id": "teams-create-channel",
+    "description": "Create a new channel in a team",
+    "examples": [
+      "Create a channel called 'Project Updates' in team X",
+      "Add a new private channel to the team",
+      "Make a new channel for the sprint"
+    ],
+    "service": "teams",
+    "endpoint": "/teams/{team-id}/channels",
+    "method": "POST",
+    "scopes": ["Channel.Create"],
+    "body_template": {
+      "displayName": "{{channelName}}",
+      "description": "{{description}}",
+      "membershipType": "standard"
+    },
+    "notes": "membershipType can be 'standard', 'private', or 'shared'. Private channels require additional owner setup.",
+    "tags": ["teams", "channels", "create"]
+  },
+  {
+    "id": "teams-delete-channel",
+    "description": "Delete a channel from a team",
+    "examples": [
+      "Delete channel X from team Y",
+      "Remove the old project channel"
+    ],
+    "service": "teams",
+    "endpoint": "/teams/{team-id}/channels/{channel-id}",
+    "method": "DELETE",
+    "scopes": ["Channel.Delete.All"],
+    "notes": "The General channel cannot be deleted. Deleted channels can be recovered within 21 days.",
+    "tags": ["teams", "channels", "delete"]
+  },
+  {
+    "id": "teams-list-channel-messages",
+    "description": "List messages in a channel with pagination support",
+    "examples": [
+      "Show recent messages in channel X",
+      "What are the latest messages in the General channel?",
+      "Get messages from the announcements channel"
+    ],
+    "service": "teams",
+    "endpoint": "/teams/{team-id}/channels/{channel-id}/messages",
+    "method": "GET",
+    "scopes": ["ChannelMessage.Read.All"],
+    "query_params": {
+      "$top": 20
+    },
+    "notes": "ChannelMessage.Read.All may require admin consent in some tenants. Use $top for pagination and follow @odata.nextLink for more results.",
+    "tags": ["teams", "channels", "messages", "list", "pagination"]
+  },
+  {
+    "id": "teams-get-channel-message",
+    "description": "Get a specific message from a channel",
+    "examples": [
+      "Get message details for message X in channel Y",
+      "Show me that specific channel message"
+    ],
+    "service": "teams",
+    "endpoint": "/teams/{team-id}/channels/{channel-id}/messages/{message-id}",
+    "method": "GET",
+    "scopes": ["ChannelMessage.Read.All"],
+    "notes": "ChannelMessage.Read.All may require admin consent in some tenants.",
+    "tags": ["teams", "channels", "messages", "get"]
+  },
+  {
+    "id": "teams-list-channel-message-replies",
+    "description": "List replies to a specific channel message",
+    "examples": [
+      "Show replies to message X",
+      "What are the replies in that thread?",
+      "Get the conversation thread"
+    ],
+    "service": "teams",
+    "endpoint": "/teams/{team-id}/channels/{channel-id}/messages/{message-id}/replies",
+    "method": "GET",
+    "scopes": ["ChannelMessage.Read.All"],
+    "notes": "ChannelMessage.Read.All may require admin consent in some tenants.",
+    "tags": ["teams", "channels", "messages", "replies", "list"]
+  },
+  {
+    "id": "teams-send-channel-message",
+    "description": "Send a new message to a channel",
+    "examples": [
+      "Post a message in channel X",
+      "Send 'Hello team' to the General channel",
+      "Write a message in the announcements channel"
+    ],
+    "service": "teams",
+    "endpoint": "/teams/{team-id}/channels/{channel-id}/messages",
+    "method": "POST",
+    "scopes": ["ChannelMessage.Send"],
+    "body_template": {
+      "body": {
+        "contentType": "html",
+        "content": "{{messageContent}}"
+      }
+    },
+    "notes": "contentType can be 'text' or 'html'. Use html for rich formatting.",
+    "tags": ["teams", "channels", "messages", "send", "create"]
+  },
+  {
+    "id": "teams-reply-channel-message",
+    "description": "Send a reply to a specific channel message",
+    "examples": [
+      "Reply to message X in channel Y",
+      "Respond to that thread",
+      "Add a reply to the conversation"
+    ],
+    "service": "teams",
+    "endpoint": "/teams/{team-id}/channels/{channel-id}/messages/{message-id}/replies",
+    "method": "POST",
+    "scopes": ["ChannelMessage.Send"],
+    "body_template": {
+      "body": {
+        "contentType": "html",
+        "content": "{{replyContent}}"
+      }
+    },
+    "tags": ["teams", "channels", "messages", "replies", "send"]
+  },
+  {
+    "id": "teams-list-my-chats",
+    "description": "List all chats for the current user",
+    "examples": [
+      "Show my chats",
+      "List my recent conversations",
+      "What chats do I have?"
+    ],
+    "service": "teams",
+    "endpoint": "/me/chats",
+    "method": "GET",
+    "scopes": ["Chat.ReadBasic", "Chat.Read"],
+    "query_params": {
+      "$top": 50,
+      "$orderby": "lastMessagePreview/createdDateTime desc"
+    },
+    "tags": ["teams", "chats", "list"]
+  },
+  {
+    "id": "teams-list-one-on-one-chats",
+    "description": "List one-on-one chats for the current user",
+    "examples": [
+      "Show my direct messages",
+      "List my 1:1 chats",
+      "Show my one-on-one conversations"
+    ],
+    "service": "teams",
+    "endpoint": "/me/chats",
+    "method": "GET",
+    "scopes": ["Chat.ReadBasic", "Chat.Read"],
+    "query_params": {
+      "$filter": "chatType eq 'oneOnOne'",
+      "$top": 50
+    },
+    "tags": ["teams", "chats", "list", "one-on-one", "direct-message"]
+  },
+  {
+    "id": "teams-list-group-chats",
+    "description": "List group chats for the current user",
+    "examples": [
+      "Show my group chats",
+      "List group conversations",
+      "What group chats am I in?"
+    ],
+    "service": "teams",
+    "endpoint": "/me/chats",
+    "method": "GET",
+    "scopes": ["Chat.ReadBasic", "Chat.Read"],
+    "query_params": {
+      "$filter": "chatType eq 'group'",
+      "$top": 50
+    },
+    "tags": ["teams", "chats", "list", "group"]
+  },
+  {
+    "id": "teams-get-chat",
+    "description": "Get details of a specific chat",
+    "examples": [
+      "Get info about chat X",
+      "Show chat details",
+      "What kind of chat is this?"
+    ],
+    "service": "teams",
+    "endpoint": "/me/chats/{chat-id}",
+    "method": "GET",
+    "scopes": ["Chat.ReadBasic", "Chat.Read"],
+    "notes": "Chat messages use /me/chats/{id}/messages -- the chat ID is required.",
+    "tags": ["teams", "chats", "get"]
+  },
+  {
+    "id": "teams-list-chat-messages",
+    "description": "List messages in a specific chat with pagination",
+    "examples": [
+      "Show messages in chat X",
+      "What are the recent messages in this conversation?",
+      "Get chat history"
+    ],
+    "service": "teams",
+    "endpoint": "/me/chats/{chat-id}/messages",
+    "method": "GET",
+    "scopes": ["Chat.Read"],
+    "query_params": {
+      "$top": 20
+    },
+    "notes": "Chat messages use /me/chats/{id}/messages -- the chat ID is required. Use $top for pagination and follow @odata.nextLink for more results.",
+    "tags": ["teams", "chats", "messages", "list", "pagination"]
+  },
+  {
+    "id": "teams-send-chat-message",
+    "description": "Send a message in a specific chat",
+    "examples": [
+      "Send a message in chat X",
+      "Message John in our 1:1 chat",
+      "Reply in the group chat"
+    ],
+    "service": "teams",
+    "endpoint": "/me/chats/{chat-id}/messages",
+    "method": "POST",
+    "scopes": ["Chat.ReadWrite"],
+    "body_template": {
+      "body": {
+        "contentType": "html",
+        "content": "{{messageContent}}"
+      }
+    },
+    "notes": "Chat messages use /me/chats/{id}/messages -- the chat ID is required.",
+    "tags": ["teams", "chats", "messages", "send", "create"]
+  },
+  {
+    "id": "teams-list-chat-members",
+    "description": "List members of a specific chat",
+    "examples": [
+      "Who is in this chat?",
+      "List chat participants",
+      "Show members of chat X"
+    ],
+    "service": "teams",
+    "endpoint": "/me/chats/{chat-id}/members",
+    "method": "GET",
+    "scopes": ["ChatMember.Read", "Chat.ReadBasic"],
+    "tags": ["teams", "chats", "members", "list"]
+  },
+  {
+    "id": "teams-get-my-presence",
+    "description": "Get the current user's presence status",
+    "examples": [
+      "What is my status?",
+      "Am I showing as available?",
+      "Check my presence"
+    ],
+    "service": "teams",
+    "endpoint": "/me/presence",
+    "method": "GET",
+    "scopes": ["Presence.Read"],
+    "tags": ["teams", "presence", "status", "me"]
+  },
+  {
+    "id": "teams-get-user-presence",
+    "description": "Get the presence status of a specific user",
+    "examples": [
+      "Is John online?",
+      "What is Sarah's status?",
+      "Check if user X is available"
+    ],
+    "service": "teams",
+    "endpoint": "/users/{user-id}/presence",
+    "method": "GET",
+    "scopes": ["Presence.Read.All"],
+    "tags": ["teams", "presence", "status", "user"]
+  },
+  {
+    "id": "teams-get-presence-batch",
+    "description": "Get presence status for multiple users at once",
+    "examples": [
+      "Who on my team is online right now?",
+      "Check availability for John, Sarah, and Mike",
+      "Get presence for multiple people"
+    ],
+    "service": "teams",
+    "endpoint": "/communications/getPresencesByUserId",
+    "method": "POST",
+    "scopes": ["Presence.Read.All"],
+    "body_template": {
+      "ids": ["{{userId1}}", "{{userId2}}", "{{userId3}}"]
+    },
+    "notes": "Accepts up to 650 user IDs per request. Returns availability and activity for each user.",
+    "tags": ["teams", "presence", "status", "batch", "bulk"]
+  },
+  {
+    "id": "teams-update-channel",
+    "description": "Update properties of a channel in a team",
+    "examples": [
+      "Rename the channel to 'New Name'",
+      "Update the channel description",
+      "Change channel settings"
+    ],
+    "service": "teams",
+    "endpoint": "/teams/{team-id}/channels/{channel-id}",
+    "method": "PATCH",
+    "scopes": ["Channel.ReadBasic.All", "ChannelSettings.ReadWrite.All"],
+    "body_template": {
+      "displayName": "{{newName}}",
+      "description": "{{newDescription}}"
+    },
+    "notes": "The General channel's displayName cannot be changed, but its description can be updated.",
+    "tags": ["teams", "channels", "update"]
+  },
+  {
+    "id": "teams-list-channel-members",
+    "description": "List members of a specific channel",
+    "examples": [
+      "Who has access to this channel?",
+      "List members of channel X",
+      "Show channel participants"
+    ],
+    "service": "teams",
+    "endpoint": "/teams/{team-id}/channels/{channel-id}/members",
+    "method": "GET",
+    "scopes": ["ChannelMember.Read.All"],
+    "notes": "For standard channels, this returns all team members. For private/shared channels, only members with explicit access.",
+    "tags": ["teams", "channels", "members", "list"]
+  },
+  {
+    "id": "teams-create-chat",
+    "description": "Create a new one-on-one or group chat",
+    "examples": [
+      "Start a new chat with John",
+      "Create a group chat with John and Sarah",
+      "Open a new conversation"
+    ],
+    "service": "teams",
+    "endpoint": "/chats",
+    "method": "POST",
+    "scopes": ["Chat.Create"],
+    "body_template": {
+      "chatType": "oneOnOne",
+      "members": [
+        {
+          "@odata.type": "#microsoft.graph.aadUserConversationMember",
+          "roles": ["owner"],
+          "user@odata.bind": "https://graph.microsoft.com/v1.0/users('{{userId1}}')"
+        },
+        {
+          "@odata.type": "#microsoft.graph.aadUserConversationMember",
+          "roles": ["owner"],
+          "user@odata.bind": "https://graph.microsoft.com/v1.0/users('{{userId2}}')"
+        }
+      ]
+    },
+    "notes": "Use chatType 'oneOnOne' for 1:1 or 'group' for group chats. Group chats can optionally include a topic.",
+    "tags": ["teams", "chats", "create"]
+  },
+  {
+    "id": "teams-update-chat",
+    "description": "Update a chat's properties such as its topic",
+    "examples": [
+      "Rename the group chat to 'Project Alpha'",
+      "Change the chat topic",
+      "Update the group chat name"
+    ],
+    "service": "teams",
+    "endpoint": "/chats/{chat-id}",
+    "method": "PATCH",
+    "scopes": ["Chat.ReadWrite"],
+    "body_template": {
+      "topic": "{{newTopic}}"
+    },
+    "notes": "Only group chats support topics. One-on-one chat topics cannot be set.",
+    "tags": ["teams", "chats", "update"]
+  },
+  {
+    "id": "teams-add-chat-member",
+    "description": "Add a member to a group chat",
+    "examples": [
+      "Add John to the group chat",
+      "Invite a user to this chat",
+      "Add a new participant"
+    ],
+    "service": "teams",
+    "endpoint": "/chats/{chat-id}/members",
+    "method": "POST",
+    "scopes": ["ChatMember.ReadWrite", "Chat.ReadWrite"],
+    "body_template": {
+      "@odata.type": "#microsoft.graph.aadUserConversationMember",
+      "roles": ["owner"],
+      "user@odata.bind": "https://graph.microsoft.com/v1.0/users('{{userId}}')",
+      "visibleHistoryStartDateTime": "0001-01-01T00:00:00Z"
+    },
+    "notes": "Set visibleHistoryStartDateTime to control how far back in chat history the new member can see.",
+    "tags": ["teams", "chats", "members", "add", "create"]
+  },
+  {
+    "id": "teams-get-channel-message-delta",
+    "description": "Get incremental changes (delta) to messages in a channel",
+    "examples": [
+      "Get new messages since last check",
+      "What messages are new in this channel?",
+      "Sync channel messages"
+    ],
+    "service": "teams",
+    "endpoint": "/teams/{team-id}/channels/{channel-id}/messages/delta",
+    "method": "GET",
+    "scopes": ["ChannelMessage.Read.All"],
+    "notes": "ChannelMessage.Read.All may require admin consent in some tenants. Use the deltaLink from a previous response to get only new/changed messages.",
+    "tags": ["teams", "channels", "messages", "delta", "sync"]
+  },
+  {
+    "id": "teams-set-my-presence",
+    "description": "Set the current user's presence status and activity",
+    "examples": [
+      "Set my status to busy",
+      "Mark me as do not disturb",
+      "Change my availability to away"
+    ],
+    "service": "teams",
+    "endpoint": "/me/presence/setPresence",
+    "method": "POST",
+    "scopes": ["Presence.ReadWrite"],
+    "body_template": {
+      "sessionId": "{{applicationSessionId}}",
+      "availability": "{{availability}}",
+      "activity": "{{activity}}",
+      "expirationDuration": "PT1H"
+    },
+    "notes": "availability values: Available, Busy, DoNotDisturb, BeRightBack, Away, Offline. expirationDuration uses ISO 8601 duration format. A unique sessionId per app instance is required.",
+    "tags": ["teams", "presence", "status", "set", "update"]
+  }
+]
