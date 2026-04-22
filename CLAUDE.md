@@ -65,6 +65,20 @@ src/
 
 **m365-calendar-mcp** — Has its own `CLAUDE.md` covering auth (MSAL PKCE) and bundling strategy.
 
+## Binary Distribution (OneDrive)
+
+After building binaries for any server, always copy them to OneDrive for distribution:
+
+- **macOS:** `~/Library/CloudStorage/OneDrive-Ascend/MCPs/macOS/` — copy the `-macos-arm64` binary as-is
+- **Windows:** `~/Library/CloudStorage/OneDrive-Ascend/MCPs/Windows/` — copy the `-win-x64.exe` binary but rename it to `.txt` extension (OneDrive blocks `.exe` files)
+
+Example for a server named `foo-mcp`:
+```bash
+ONEDRIVE=~/Library/CloudStorage/OneDrive-Ascend/MCPs
+cp servers/foo-mcp/release/foo-mcp-macos-arm64 "$ONEDRIVE/macOS/"
+cp servers/foo-mcp/release/foo-mcp-win-x64.exe "$ONEDRIVE/Windows/foo-mcp-win-x64.txt"
+```
+
 ## Adding a New Server
 
 1. Create `servers/<server-name>/` with its own `package.json`, `tsconfig.json`, `.env.example`
