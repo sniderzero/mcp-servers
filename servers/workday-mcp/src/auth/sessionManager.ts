@@ -2,6 +2,8 @@ import type { WorkdayConfig } from "../config/env.js";
 import { refreshToken, type TokenPair } from "./oauth.js";
 import { FileTokenStore, type TokenStore } from "./tokenStore.js";
 
+export type AuthenticateFn = (config: WorkdayConfig) => Promise<TokenPair>;
+
 export class AuthExpiredError extends Error {
   constructor() {
     super(
@@ -22,6 +24,7 @@ export class SessionManager {
   constructor(
     private readonly config: WorkdayConfig,
     store?: TokenStore,
+    private readonly authenticateFn?: AuthenticateFn,
   ) {
     this.store = store ?? new FileTokenStore();
   }
@@ -48,6 +51,12 @@ export class SessionManager {
     }
 
     if (!tokens) {
+      if (this.authenticateFn) {
+        process.stderr.write("[workday-mcp] No cached token — starting OAuth flow...\n");
+        const fresh = await this.authenticateFn(this.config);
+        this.setSession(sessionId, fresh);
+        return fresh.accessToken;
+      }
       throw new AuthExpiredError();
     }
 

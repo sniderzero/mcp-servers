@@ -1,5 +1,6 @@
 import * as crypto from "crypto";
 import * as https from "https";
+import { execSync } from "child_process";
 import open from "open";
 import type { WorkdayConfig } from "../config/env.js";
 import { generateSelfSignedCert } from "./localCert.js";
@@ -102,7 +103,41 @@ function captureAuthCode(
       resolve(code);
     });
 
-    server.on("error", reject);
+    server.on("error", (err: NodeJS.ErrnoException) => {
+      if (err.code === "EADDRINUSE") {
+        // A stale workday-mcp process is likely holding the port — kill it and retry once.
+        process.stderr.write(
+          `\n[workday-mcp] Port ${port} in use — killing stale process and retrying...\n`,
+        );
+        try {
+          // lsof gives us the PID; skip header line, grab first result
+          const pid = execSync(`lsof -ti tcp:${port} -sTCP:LISTEN`, { encoding: "utf8" })
+            .trim()
+            .split("\n")[0];
+          if (pid) {
+            process.kill(Number(pid), "SIGTERM");
+            // Give the OS a moment to release the port
+            setTimeout(() => {
+              server.listen(port, () => {
+                process.stderr.write("\nOpening browser for Workday authentication...\n");
+                process.stderr.write(`Auth URL: ${authUrl}\n\n`);
+                open(authUrl).catch(reject);
+              });
+            }, 500);
+            return;
+          }
+        } catch {
+          // lsof failed or no PID — fall through to original error
+        }
+        reject(
+          new Error(
+            `Port ${port} is already in use. Stop whatever is listening on that port and try again.`,
+          ),
+        );
+      } else {
+        reject(err);
+      }
+    });
 
     server.listen(port, () => {
       process.stderr.write("\nOpening browser for Workday authentication...\n");

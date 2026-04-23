@@ -28,18 +28,8 @@ const tenantName = env.WORKDAY_TENANT_URL.replace(/\/+$/, "").split("/").pop() ?
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
-const sessionManager = new SessionManager(config);
-
-// Bootstrap auth for the default stdio session
-async function ensureAuthenticated(): Promise<void> {
-  try {
-    await sessionManager.getToken("default");
-  } catch {
-    process.stderr.write("[workday-mcp] No cached token — starting OAuth flow...\n");
-    const tokens = await authenticate(config);
-    sessionManager.setSession("default", tokens);
-  }
-}
+// Pass authenticate so SessionManager can trigger OAuth lazily on the first tool call
+const sessionManager = new SessionManager(config, undefined, authenticate);
 
 // ── Clients ───────────────────────────────────────────────────────────────────
 
@@ -57,8 +47,6 @@ const ctx = { sessionManager, soapCodec, restClient, raasClient, wqlClient };
 const server = createServer(ctx);
 
 // ── Transport ─────────────────────────────────────────────────────────────────
-
-await ensureAuthenticated();
 
 if (env.MCP_TRANSPORT === "http") {
   const transport = new StreamableHTTPServerTransport({
