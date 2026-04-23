@@ -102,16 +102,13 @@ export async function handleGetFinancialInstitutions(
   args: unknown,
   ctx: WorkdayContext,
 ): Promise<unknown> {
-  const { page, count } = args as { page?: number; count?: number };
-
-  try {
-    const token = await ctx.sessionManager.getToken("default");
-    return await ctx.soapCodec.execute(
-      getFinancialInstitutions,
-      { Response_Filter: { Page: page, Count: count } },
-      token,
-    );
-  } catch (err) {
-    throw normalizeError(err);
-  }
+  // Financial institutions are not exposed in the Financial_Management WSDL.
+  // They live in the Banking or Treasury service — this tool needs to be
+  // re-pointed to the correct service + operation once that service is added.
+  throw new McpError(
+    ErrorCode.InternalError,
+    "workday_get_financial_institutions is not yet available: the Financial_Management " +
+      "WSDL does not expose a financial institutions listing operation. " +
+      "This tool needs to be wired to the Banking/Treasury service.",
+  );
 }

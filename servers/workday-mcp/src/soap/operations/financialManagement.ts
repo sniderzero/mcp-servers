@@ -83,7 +83,7 @@ export const getAccountPostingRules: SoapOperation<
 > = {
   service: SERVICE,
   version: VERSION,
-  operation: "Get_Account_Posting_Rules",
+  operation: "Get_Account_Posting_Rule_Sets",
   requestSchema: z.object({
     Response_Filter: z
       .object({ Page: z.number().optional(), Count: z.number().optional() })
@@ -105,7 +105,7 @@ export const getFinancialInstitutions: SoapOperation<
 > = {
   service: SERVICE,
   version: VERSION,
-  operation: "Get_Financial_Institutions",
+  operation: "Get_Banks",
   requestSchema: z.object({
     Response_Filter: z
       .object({ Page: z.number().optional(), Count: z.number().optional() })
@@ -131,9 +131,8 @@ export const getPayments: SoapOperation<GetPaymentsRequest, GetPaymentsResponse>
       .optional(),
     Request_Criteria: z
       .object({
-        Payment_Date_Range: z
-          .object({ Start_Date: z.string().optional(), End_Date: z.string().optional() })
-          .optional(),
+        Payment_Date_On_or_After: z.string().optional(),
+        Payment_Date_On_or_Before: z.string().optional(),
         Payee_Reference: wdRef.optional(),
       })
       .optional(),

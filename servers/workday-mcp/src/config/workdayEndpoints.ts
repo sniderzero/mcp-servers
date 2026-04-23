@@ -2,6 +2,7 @@ export const WORKDAY_API_VERSIONS: Record<string, string> = {
   Financial_Management: "v44.2",
   Resource_Management: "v42.1",
   Human_Resources: "v44.0",
+  System: "v44.2",
 };
 
 /**

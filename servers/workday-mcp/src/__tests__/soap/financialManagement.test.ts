@@ -187,7 +187,7 @@ describe("getPayments", () => {
   it("builds body with criteria", () => {
     const body = getPayments.buildBody({
       Request_Criteria: {
-        Payment_Date_Range: { Start_Date: "2026-01-01" },
+        Payment_Date_On_or_After: "2026-01-01",
       },
     });
     expect(body["Request_Criteria"]).toBeDefined();

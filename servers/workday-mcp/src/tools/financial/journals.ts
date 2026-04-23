@@ -172,10 +172,8 @@ export async function handleGetPayments(
       {
         Response_Filter: { Page: page, Count: count },
         Request_Criteria: {
-          Payment_Date_Range: {
-            Start_Date: start_date,
-            End_Date: end_date,
-          },
+          Payment_Date_On_or_After: start_date,
+          Payment_Date_On_or_Before: end_date,
         },
       },
       token,

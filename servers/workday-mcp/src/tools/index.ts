@@ -36,6 +36,16 @@ import {
   handleWqlQuery,
   handleWqlQueryAll,
 } from "./reporting/queries.js";
+import {
+  SECURITY_TOOL_DEFINITIONS,
+  handleGetWorkers,
+  handleGetWorkdayAccount,
+  handleUpdateWorkdayAccount,
+  handleAddWorkdayAccount,
+  handleGetProvisioningGroups,
+  handleGetProvisioningGroupAssignments,
+  handlePutProvisioningGroupAssignment,
+} from "./security/accounts.js";
 
 // ── Context passed to every tool handler ─────────────────────────────────────
 
@@ -56,6 +66,7 @@ export const TOOL_DEFINITIONS = [
   ...PURCHASE_ORDER_TOOL_DEFINITIONS,
   ...REPORTS_TOOL_DEFINITIONS,
   ...QUERIES_TOOL_DEFINITIONS,
+  ...SECURITY_TOOL_DEFINITIONS,
 ];
 
 // ── Tool handler registry (used by CallToolRequestSchema) ────────────────────
@@ -83,6 +94,14 @@ const TOOL_HANDLERS: Record<string, ToolHandler> = {
   // Reporting — WQL
   workday_wql_query: handleWqlQuery,
   workday_wql_query_all: handleWqlQueryAll,
+  // Security — Account & Provisioning Management
+  workday_get_workers: handleGetWorkers,
+  workday_get_workday_account: handleGetWorkdayAccount,
+  workday_update_workday_account: handleUpdateWorkdayAccount,
+  workday_add_workday_account: handleAddWorkdayAccount,
+  workday_get_provisioning_groups: handleGetProvisioningGroups,
+  workday_get_provisioning_group_assignments: handleGetProvisioningGroupAssignments,
+  workday_put_provisioning_group_assignment: handlePutProvisioningGroupAssignment,
 };
 
 export function getToolHandler(name: string): ToolHandler | undefined {

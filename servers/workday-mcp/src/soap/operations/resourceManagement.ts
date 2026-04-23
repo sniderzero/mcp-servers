@@ -45,7 +45,6 @@ export const getSupplierInvoices: SoapOperation<
     Request_Criteria: z
       .object({
         Invoice_Number: z.string().optional(),
-        Include_Archived: z.boolean().optional(),
       })
       .optional(),
   }),

@@ -167,7 +167,7 @@ export async function handleGetInvoiceAdjustments(
       getSupplierInvoices,
       {
         Response_Filter: { Page: page, Count: count },
-        Request_Criteria: { Include_Archived: true },
+        Request_Criteria: {},
       },
       token,
     );
