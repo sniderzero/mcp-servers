@@ -70,6 +70,12 @@ async function main() {
     process.exit(0);
   }
 
+  if (process.argv[2] === "uninstall") {
+    const { runUninstall } = await import("./setup.js");
+    await runUninstall();
+    process.exit(0);
+  }
+
   const clientId = process.env.GREENHOUSE_CLIENT_ID;
   const clientSecret = process.env.GREENHOUSE_CLIENT_SECRET;
   if (!clientId || !clientSecret) {

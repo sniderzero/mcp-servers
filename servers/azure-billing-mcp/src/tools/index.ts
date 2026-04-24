@@ -1,5 +1,10 @@
 import type { AzureClient } from "../api/client.js";
 import {
+  AUTH_TOOL_DEFINITIONS,
+  handleAuthStatus,
+  handleAuthLogin,
+} from "./authTools.js";
+import {
   COST_QUERY_TOOL_DEFINITIONS,
   handleQueryCosts,
   handleQueryCostsByResource,
@@ -91,19 +96,25 @@ function annotateTools(defs: Array<Record<string, unknown>>) {
   }));
 }
 
-export const ALL_TOOL_DEFINITIONS = annotateTools([
-  ...COST_QUERY_TOOL_DEFINITIONS,
-  ...FORECAST_TOOL_DEFINITIONS,
-  ...RESERVATION_TOOL_DEFINITIONS,
-  ...BUDGET_TOOL_DEFINITIONS,
-  ...RECOMMENDATION_TOOL_DEFINITIONS,
-  ...INVOICE_TOOL_DEFINITIONS,
-  ...SUBSCRIPTION_TOOL_DEFINITIONS,
-]);
+export const ALL_TOOL_DEFINITIONS = [
+  ...AUTH_TOOL_DEFINITIONS,
+  ...annotateTools([
+    ...COST_QUERY_TOOL_DEFINITIONS,
+    ...FORECAST_TOOL_DEFINITIONS,
+    ...RESERVATION_TOOL_DEFINITIONS,
+    ...BUDGET_TOOL_DEFINITIONS,
+    ...RECOMMENDATION_TOOL_DEFINITIONS,
+    ...INVOICE_TOOL_DEFINITIONS,
+    ...SUBSCRIPTION_TOOL_DEFINITIONS,
+  ]),
+];
 
 type ToolHandler = (args: unknown, client: AzureClient) => Promise<unknown>;
 
 const TOOL_HANDLERS: Record<string, ToolHandler> = {
+  // Auth
+  azure_billing_auth_status: handleAuthStatus,
+  azure_billing_auth_login: handleAuthLogin,
   // Cost Queries
   azure_billing_query_costs: handleQueryCosts,
   azure_billing_query_costs_by_resource: handleQueryCostsByResource,

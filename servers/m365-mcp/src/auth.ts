@@ -6,6 +6,9 @@ import {
   type TokenCacheContext,
 } from "@azure/msal-node";
 import { promises as fs } from "node:fs";
+import * as http from "node:http";
+import * as crypto from "node:crypto";
+import { execSync } from "node:child_process";
 import { homedir } from "node:os";
 import path from "node:path";
 
@@ -90,6 +93,89 @@ export function getPublicClientApp(): PublicClientApplication {
   });
 
   return pca;
+}
+
+export async function doBrowserAuth(scopes: string[]): Promise<string> {
+  const app = getPublicClientApp();
+
+  const port = parseInt(process.env.M365_MCP_REDIRECT_PORT ?? "8787", 10);
+  const redirectPath = "/callback";
+  const redirectUri = `http://localhost:${port}${redirectPath}`;
+
+  const verifier = crypto.randomBytes(32).toString("base64url");
+  const challenge = crypto.createHash("sha256").update(verifier).digest("base64url");
+
+  const authUrl = await app.getAuthCodeUrl({
+    scopes,
+    redirectUri,
+    codeChallenge: challenge,
+    codeChallengeMethod: "S256",
+  });
+
+  process.stderr.write(`\n[m365-mcp] Open this URL to sign in:\n${authUrl}\n\n`);
+
+  const platform = process.platform;
+  const openCmd =
+    platform === "win32"
+      ? `start "" "${authUrl}"`
+      : platform === "darwin"
+        ? `open "${authUrl}"`
+        : `xdg-open "${authUrl}"`;
+  try {
+    execSync(openCmd, { stdio: "ignore" });
+  } catch {
+    /* ignore — user can open the URL manually */
+  }
+
+  const code = await new Promise<string>((resolve, reject) => {
+    const srv = http.createServer((req, res) => {
+      const url = new URL(req.url ?? "/", `http://localhost:${port}`);
+      if (url.pathname !== redirectPath) {
+        res.writeHead(404).end("Not found");
+        return;
+      }
+      const code = url.searchParams.get("code");
+      const error = url.searchParams.get("error");
+      const errorDesc = url.searchParams.get("error_description");
+      res.writeHead(200, { "Content-Type": "text/html" });
+      if (code) {
+        res.end("<html><body><h2>M365: Authorization successful!</h2><p>You may close this tab.</p></body></html>");
+        srv.close();
+        resolve(code);
+      } else {
+        res.end(`<html><body><h2>Authorization failed</h2><p>${errorDesc ?? error ?? "Unknown error"}</p></body></html>`);
+        srv.close();
+        reject(new Error(`OAuth error: ${errorDesc ?? error ?? "unknown"}`));
+      }
+    });
+    srv.listen(port, "localhost");
+    srv.on("error", reject);
+  });
+
+  const result = await app.acquireTokenByCode({
+    code,
+    scopes,
+    redirectUri,
+    codeVerifier: verifier,
+  });
+
+  if (!result?.accessToken) {
+    throw new Error("Authentication failed: no access token returned");
+  }
+
+  return result.accessToken;
+}
+
+export async function checkSilentAuth(scopes: string[]): Promise<boolean> {
+  const app = getPublicClientApp();
+  try {
+    const accounts = await app.getTokenCache().getAllAccounts();
+    if (accounts.length === 0) return false;
+    const result = await app.acquireTokenSilent({ account: accounts[0], scopes });
+    return !!result?.accessToken;
+  } catch {
+    return false;
+  }
 }
 
 export async function getAccessToken(scopes: string[]): Promise<string> {

@@ -18,6 +18,12 @@ async function main() {
     process.exit(0);
   }
 
+  if (subcommand === "uninstall") {
+    const { runUninstall } = await import("./setup.js");
+    await runUninstall();
+    process.exit(0);
+  }
+
   if (subcommand === "--auth") {
     // One-time interactive auth: browser OAuth flow, cache tokens, then exit
     console.log("[M365 Planner] Starting authentication...");

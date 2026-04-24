@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { OAuthProvider, doBrowserAuth, GRAPH_SCOPES } from "./auth/oauthAuth.js";
 import { registerUserTools } from "./tools/users/index.js";
+import { registerAuthTools } from "./tools/auth/index.js";
 
 async function main() {
   if (!(process as unknown as { pkg?: unknown }).pkg) {
@@ -13,6 +14,12 @@ async function main() {
   if (subcommand === "setup") {
     const { runSetup } = await import("./setup.js");
     await runSetup();
+    process.exit(0);
+  }
+
+  if (subcommand === "uninstall") {
+    const { runUninstall } = await import("./setup.js");
+    await runUninstall();
     process.exit(0);
   }
 
@@ -33,6 +40,7 @@ async function main() {
   });
 
   registerUserTools(server, provider);
+  registerAuthTools(server);
 
   const transport = new StdioServerTransport();
   await server.connect(transport);

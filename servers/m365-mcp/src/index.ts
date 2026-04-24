@@ -8,6 +8,7 @@ import { registerSearchTool } from "./tools/search.js";
 import { registerReadTool, registerWriteTool } from "./tools/execute.js";
 import { registerBatchReadTool, registerBatchWriteTool } from "./tools/batch.js";
 import { registerSchemaTool } from "./tools/schema.js";
+import { registerAuthTools } from "./tools/auth.js";
 
 const clientId = process.env.AZURE_CLIENT_ID;
 if (!clientId) {
@@ -35,6 +36,7 @@ const graphClient = getGraphClient();
 
 // Create MCP server and register 6 tools (read tools auto-approved, write tools require approval)
 const server = new McpServer({ name: "m365-mcp", version: "2.1.0" });
+registerAuthTools(server);
 registerSearchTool(server, catalog, embeddings);
 registerSchemaTool(server);
 registerReadTool(server, graphClient);

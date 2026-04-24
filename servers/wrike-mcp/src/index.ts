@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { readFileSync, writeFileSync, copyFileSync, mkdirSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, copyFileSync, mkdirSync, existsSync, rmSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { homedir } from "node:os";
 import { execSync } from "node:child_process";
@@ -49,6 +49,69 @@ function mergeConfig(configPath: string, installPath: string): void {
   writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n", "utf-8");
 }
 
+async function runUninstall(): Promise<void> {
+  const installPath = getInstallPath();
+  const MCP_KEY = "wrike";
+  const cacheFile = join(homedir(), ".wrike-mcp-tokens.json");
+
+  console.log("Wrike Uninstall\n===============\n");
+
+  if (existsSync(installPath)) {
+    try { rmSync(installPath, { force: true }); console.log(`✅  Removed binary: ${installPath}`); }
+    catch (e) { console.log(`⚠️   Could not remove binary: ${(e as Error).message}`); }
+  } else {
+    console.log("ℹ️   Binary not found — skipping.");
+  }
+
+  const desktopConfig = getClaudeDesktopConfigPath();
+  if (existsSync(desktopConfig)) {
+    try {
+      const config = JSON.parse(readFileSync(desktopConfig, "utf-8")) as Record<string, unknown>;
+      const servers = config.mcpServers as Record<string, unknown> | undefined;
+      if (servers?.[MCP_KEY]) {
+        delete servers[MCP_KEY];
+        writeFileSync(desktopConfig, JSON.stringify(config, null, 2) + "\n", "utf-8");
+        console.log("✅  Removed from Claude Desktop config");
+      } else {
+        console.log("ℹ️   Not in Claude Desktop config — skipping.");
+      }
+    } catch { console.log("⚠️   Could not update Claude Desktop config."); }
+  }
+
+  const codeConfig = join(homedir(), ".claude", "mcp.json");
+  if (existsSync(codeConfig)) {
+    try {
+      const config = JSON.parse(readFileSync(codeConfig, "utf-8")) as Record<string, unknown>;
+      const servers = config.mcpServers as Record<string, unknown> | undefined;
+      if (servers?.[MCP_KEY]) {
+        delete servers[MCP_KEY];
+        writeFileSync(codeConfig, JSON.stringify(config, null, 2) + "\n", "utf-8");
+        console.log("✅  Removed from Claude Code config");
+      } else {
+        console.log("ℹ️   Not in Claude Code config — skipping.");
+      }
+    } catch { console.log("⚠️   Could not update Claude Code config."); }
+  }
+
+  const claudeCmd = process.platform === "win32" ? "claude.cmd" : "claude";
+  const execEnv = { ...process.env, PATH: [process.env.PATH ?? "", "/opt/homebrew/bin", "/usr/local/bin", join(homedir(), ".local", "bin")].join(":") };
+  try {
+    execSync(`${claudeCmd} --version`, { stdio: "ignore", env: execEnv });
+    try { execSync(`${claudeCmd} mcp remove -s user ${MCP_KEY}`, { stdio: "pipe", env: execEnv }); console.log("✅  Removed from Claude Code"); }
+    catch { console.log("ℹ️   Not registered in Claude Code — skipping."); }
+  } catch { console.log("⚠️   Claude Code CLI not detected — skipping."); }
+
+  if (existsSync(cacheFile)) {
+    try { rmSync(cacheFile, { force: true }); console.log("✅  Removed token cache"); }
+    catch (e) { console.log(`⚠️   Could not remove token cache: ${(e as Error).message}`); }
+  } else {
+    console.log("ℹ️   No token cache found — skipping.");
+  }
+
+  console.log("\n======================================\n  Uninstall complete!\n======================================\n");
+  console.log("👉  Restart Claude Desktop / Claude Code to apply changes.\n");
+}
+
 async function runSetup(): Promise<void> {
   const sourcePath = process.execPath;
   const installPath = getInstallPath();
@@ -95,6 +158,11 @@ async function runSetup(): Promise<void> {
 if (subcommand === "setup") {
   runSetup().then(() => process.exit(0)).catch((err) => {
     console.error("Setup failed:", err);
+    process.exit(1);
+  });
+} else if (subcommand === "uninstall") {
+  runUninstall().then(() => process.exit(0)).catch((err) => {
+    console.error("Uninstall failed:", err);
     process.exit(1);
   });
 } else if (subcommand === "--auth") {

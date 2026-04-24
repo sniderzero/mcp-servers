@@ -27,6 +27,12 @@ async function main(): Promise<void> {
     process.exit(0);
   }
 
+  if (subcommand === "uninstall") {
+    const { runUninstall } = await import("./setup.js");
+    await runUninstall();
+    process.exit(0);
+  }
+
   const auth = new ApiKeyAuthProvider(requireEnv("CONTROLUP_API_KEY"));
   // CONTROLUP_ORG_ID and CONTROLUP_BASE_URL are replaced at build time by esbuild define
   // so dot-notation access is required here (bracket notation via variable won't be replaced)

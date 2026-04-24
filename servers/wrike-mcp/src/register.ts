@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WrikeClient } from "./client.js";
+import { registerAuthTools } from "./tools/auth/index.js";
 
 // Phase 1: Core PM
 import { registerTasksModule } from "./tools/tasks/index.js";
@@ -17,6 +18,9 @@ import { registerDependenciesModule } from "./tools/dependencies/index.js";
 import { registerApprovalsModule } from "./tools/approvals/index.js";
 
 export function registerAllTools(server: McpServer, client: WrikeClient): void {
+  // Auth
+  registerAuthTools(server);
+
   // Phase 1: Core PM
   registerTasksModule(server, client);
   registerFoldersModule(server, client);

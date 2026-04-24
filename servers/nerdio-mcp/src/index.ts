@@ -28,6 +28,12 @@ async function main(): Promise<void> {
     process.exit(0);
   }
 
+  if (subcommand === "uninstall") {
+    const { runUninstall } = await import("./setup.js");
+    await runUninstall();
+    process.exit(0);
+  }
+
   // Interactive ARM auth mode
   if (subcommand === "--auth") {
     const armAuth = new DeviceCodeAuthProvider(["https://management.azure.com/.default"]);

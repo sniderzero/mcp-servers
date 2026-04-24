@@ -16,6 +16,12 @@ async function main() {
     process.exit(0);
   }
 
+  if (subcommand === "uninstall") {
+    const { runUninstall } = await import("./setup.js");
+    await runUninstall();
+    process.exit(0);
+  }
+
   if (subcommand === "--auth") {
     console.log("[M365 SharePoint] Starting authentication...");
     console.log("A browser window will open — sign in with your Microsoft account.\n");

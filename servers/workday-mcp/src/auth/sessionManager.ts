@@ -29,6 +29,12 @@ export class SessionManager {
     this.store = store ?? new FileTokenStore();
   }
 
+  /** Clear tokens for a session (in memory and on disk). */
+  async clearSession(sessionId: string): Promise<void> {
+    this.cache.delete(sessionId);
+    await this.store.delete(sessionId);
+  }
+
   /** Store tokens for a session (and persist to disk). */
   setSession(sessionId: string, tokens: TokenPair): void {
     this.cache.set(sessionId, tokens);

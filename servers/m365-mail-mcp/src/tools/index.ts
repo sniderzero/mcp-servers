@@ -57,6 +57,7 @@ import {
   SETTINGS_TOOL_DEFINITIONS,
   handleMailGetSettings,
 } from "./settings/index.js";
+import { AUTH_TOOL_DEFINITIONS, handleAuthStatus, handleAuthLogin } from "./auth/authTools.js";
 
 // ── Read/Write Annotations ────────────────────────────────────────────────────
 
@@ -64,6 +65,7 @@ const READ_ONLY = { readOnlyHint: true, destructiveHint: false } as const;
 const WRITE_OP = { readOnlyHint: false, destructiveHint: true } as const;
 
 const READ_TOOLS = new Set([
+  "m365_mail_auth_status",
   "m365_mail_get_message",
   "m365_mail_list_inbox",
   "m365_mail_list_folder",
@@ -86,6 +88,7 @@ function annotateTools(defs: Array<Record<string, unknown>>) {
 }
 
 export const ALL_TOOL_DEFINITIONS = annotateTools([
+  ...AUTH_TOOL_DEFINITIONS,
   ...COMPOSE_TOOL_DEFINITIONS,
   ...READ_TOOL_DEFINITIONS,
   ...ACTIONS_TOOL_DEFINITIONS,
@@ -99,6 +102,9 @@ export const ALL_TOOL_DEFINITIONS = annotateTools([
 type ToolHandler = (args: unknown, provider: TokenProvider) => Promise<unknown>;
 
 const TOOL_HANDLERS: Record<string, ToolHandler> = {
+  // Auth
+  m365_mail_auth_status: handleAuthStatus,
+  m365_mail_auth_login: handleAuthLogin,
   // Compose & Send
   m365_mail_send: handleMailSend,
   m365_mail_reply: handleMailReply,

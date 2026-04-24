@@ -3,6 +3,11 @@ import type { SoapCodec } from "../soap/codec.js";
 import type { WorkdayRestClient } from "../clients/restClient.js";
 import type { RaasClient } from "../clients/raasClient.js";
 import type { WqlClient } from "../clients/wqlClient.js";
+import {
+  AUTH_TOOL_DEFINITIONS,
+  handleAuthStatus,
+  handleAuthLogin,
+} from "./auth/index.js";
 
 import {
   ACCOUNTS_TOOL_DEFINITIONS,
@@ -60,6 +65,7 @@ export interface WorkdayContext {
 // ── Tool definitions (used by ListToolsRequestSchema) ────────────────────────
 
 export const TOOL_DEFINITIONS = [
+  ...AUTH_TOOL_DEFINITIONS,
   ...ACCOUNTS_TOOL_DEFINITIONS,
   ...INVOICES_TOOL_DEFINITIONS,
   ...JOURNALS_TOOL_DEFINITIONS,
@@ -74,6 +80,9 @@ export const TOOL_DEFINITIONS = [
 type ToolHandler = (args: unknown, ctx: WorkdayContext) => Promise<unknown>;
 
 const TOOL_HANDLERS: Record<string, ToolHandler> = {
+  // Auth
+  workday_auth_status: handleAuthStatus,
+  workday_auth_login: handleAuthLogin,
   // Financial — Accounts
   workday_get_business_units: handleGetBusinessUnits,
   workday_get_posting_rules: handleGetPostingRules,

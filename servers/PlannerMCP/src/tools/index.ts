@@ -1,6 +1,7 @@
 import type { TokenProvider } from "../auth/types.js";
 import {
   AUTH_TOOL_DEFINITIONS,
+  handleAuthStatus,
   handleAuthLogin,
 } from "./authTools.js";
 import {
@@ -95,6 +96,7 @@ const WRITE_OP = { readOnlyHint: false, destructiveHint: true } as const;
 /** Map of tool name → annotation. Tools not listed default to WRITE_OP (safe default). */
 const READ_TOOLS = new Set([
   // Auth
+  "auth_status",
   "auth_login",
   // Groups
   "list_groups", "list_group_members", "list_group_plans",
@@ -136,6 +138,7 @@ export const ALL_TOOL_DEFINITIONS = annotateTools([
 type ToolHandler = (args: unknown, provider: TokenProvider) => Promise<unknown>;
 
 const TOOL_HANDLERS: Record<string, ToolHandler> = {
+  auth_status: handleAuthStatus,
   auth_login: handleAuthLogin,
   list_groups: handleListGroups,
   list_group_members: handleListGroupMembers,

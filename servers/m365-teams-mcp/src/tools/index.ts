@@ -1,4 +1,5 @@
 import type { TokenProvider } from "../auth/types.js";
+import { AUTH_TOOL_DEFINITIONS, handleAuthStatus, handleAuthLogin } from "./auth/authTools.js";
 import { listTeamsDefinition, listTeams, getTeamDefinition, getTeam } from "./teams/teamsTools.js";
 import {
   listChannelsDefinition,
@@ -44,6 +45,8 @@ import {
 type ToolHandler = (args: Record<string, unknown>, provider: TokenProvider) => Promise<unknown>;
 
 export const ALL_TOOL_DEFINITIONS = [
+  // Auth
+  ...AUTH_TOOL_DEFINITIONS,
   // Teams
   listTeamsDefinition,
   getTeamDefinition,
@@ -71,6 +74,8 @@ export const ALL_TOOL_DEFINITIONS = [
 ];
 
 const TOOL_HANDLERS: Record<string, ToolHandler> = {
+  m365_teams_auth_status: handleAuthStatus,
+  m365_teams_auth_login: handleAuthLogin,
   m365_teams_list_teams: listTeams,
   m365_teams_get_team: getTeam,
   m365_teams_list_channels: listChannels,

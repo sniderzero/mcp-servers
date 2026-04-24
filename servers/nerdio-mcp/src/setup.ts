@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, copyFileSync, mkdirSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, copyFileSync, mkdirSync, existsSync, rmSync } from "fs";
 import { join, dirname } from "path";
 import { homedir } from "os";
 import { execSync } from "child_process";
@@ -102,4 +102,59 @@ export async function runSetup(): Promise<void> {
   console.log("  2. All Nerdio tools will be available");
   console.log("\nTo re-authenticate ARM later, run:");
   console.log(`  "${installPath}" --auth\n`);
+}
+
+export async function runUninstall(): Promise<void> {
+  const installPath = getInstallPath();
+  const MCP_KEY = "nerdio-mcp";
+
+  console.log("Nerdio Uninstall\n================\n");
+
+  if (existsSync(installPath)) {
+    try { rmSync(installPath, { force: true }); console.log(`✅  Removed binary: ${installPath}`); }
+    catch (e) { console.log(`⚠️   Could not remove binary: ${(e as Error).message}`); }
+  } else {
+    console.log("ℹ️   Binary not found — skipping.");
+  }
+
+  const desktopConfig = getClaudeDesktopConfigPath();
+  if (existsSync(desktopConfig)) {
+    try {
+      const config = JSON.parse(readFileSync(desktopConfig, "utf-8")) as Record<string, unknown>;
+      const servers = config.mcpServers as Record<string, unknown> | undefined;
+      if (servers?.[MCP_KEY]) {
+        delete servers[MCP_KEY];
+        writeFileSync(desktopConfig, JSON.stringify(config, null, 2) + "\n", "utf-8");
+        console.log("✅  Removed from Claude Desktop config");
+      } else {
+        console.log("ℹ️   Not in Claude Desktop config — skipping.");
+      }
+    } catch { console.log("⚠️   Could not update Claude Desktop config."); }
+  }
+
+  const codeConfig = getClaudeCodeConfigPath();
+  if (existsSync(codeConfig)) {
+    try {
+      const config = JSON.parse(readFileSync(codeConfig, "utf-8")) as Record<string, unknown>;
+      const servers = config.mcpServers as Record<string, unknown> | undefined;
+      if (servers?.[MCP_KEY]) {
+        delete servers[MCP_KEY];
+        writeFileSync(codeConfig, JSON.stringify(config, null, 2) + "\n", "utf-8");
+        console.log("✅  Removed from Claude Code config");
+      } else {
+        console.log("ℹ️   Not in Claude Code config — skipping.");
+      }
+    } catch { console.log("⚠️   Could not update Claude Code config."); }
+  }
+
+  const claudeCmd = process.platform === "win32" ? "claude.cmd" : "claude";
+  const execEnv = { ...process.env, PATH: [process.env.PATH ?? "", "/opt/homebrew/bin", "/usr/local/bin", join(homedir(), ".local", "bin")].join(":") };
+  try {
+    execSync(`${claudeCmd} --version`, { stdio: "ignore", env: execEnv });
+    try { execSync(`${claudeCmd} mcp remove -s user ${MCP_KEY}`, { stdio: "pipe", env: execEnv }); console.log("✅  Removed from Claude Code"); }
+    catch { console.log("ℹ️   Not registered in Claude Code — skipping."); }
+  } catch { console.log("⚠️   Claude Code CLI not detected — skipping."); }
+
+  console.log("\n======================================\n  Uninstall complete!\n======================================\n");
+  console.log("👉  Restart Claude Desktop / Claude Code to apply changes.\n");
 }

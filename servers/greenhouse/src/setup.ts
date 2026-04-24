@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, copyFileSync, readFileSync, writeFileSync, chmodSync } from "fs";
+import { existsSync, mkdirSync, copyFileSync, readFileSync, writeFileSync, chmodSync, rmSync } from "fs";
 import { execSync } from "child_process";
 import { homedir, platform } from "os";
 import { join, dirname } from "path";
@@ -107,4 +107,53 @@ export async function runSetup(): Promise<void> {
   console.log("\nNext steps:");
   console.log("  • Restart Claude Desktop or Claude Code");
   console.log("  • Your Greenhouse tools will be available automatically\n");
+}
+
+export async function runUninstall(): Promise<void> {
+  const installPath = getInstallPath();
+  const MCP_KEY = "greenhouse";
+  const cacheDir = join(homedir(), ".greenhouse-mcp");
+
+  console.log("Greenhouse Uninstall\n====================\n");
+
+  if (existsSync(installPath)) {
+    try { rmSync(installPath, { force: true }); console.log(`✅  Removed binary: ${installPath}`); }
+    catch (e) { console.log(`⚠️   Could not remove binary: ${(e as Error).message}`); }
+  } else {
+    console.log("ℹ️   Binary not found — skipping.");
+  }
+
+  for (const configPath of getClaudeDesktopConfigs()) {
+    if (existsSync(configPath)) {
+      try {
+        const config = JSON.parse(readFileSync(configPath, "utf-8")) as Record<string, unknown>;
+        const servers = config.mcpServers as Record<string, unknown> | undefined;
+        if (servers?.[MCP_KEY]) {
+          delete servers[MCP_KEY];
+          writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n", "utf-8");
+          console.log(`✅  Removed from config: ${configPath}`);
+        } else {
+          console.log(`ℹ️   Not in config: ${configPath} — skipping.`);
+        }
+      } catch { console.log(`⚠️   Could not update config: ${configPath}`); }
+    }
+  }
+
+  const claudeCmd = process.platform === "win32" ? "claude.cmd" : "claude";
+  const execEnv = { ...process.env, PATH: [process.env.PATH ?? "", "/opt/homebrew/bin", "/usr/local/bin", join(homedir(), ".local", "bin")].join(":") };
+  try {
+    execSync(`${claudeCmd} --version`, { stdio: "ignore", env: execEnv });
+    try { execSync(`${claudeCmd} mcp remove -s user ${MCP_KEY}`, { stdio: "pipe", env: execEnv }); console.log("✅  Removed from Claude Code"); }
+    catch { console.log("ℹ️   Not registered in Claude Code — skipping."); }
+  } catch { console.log("⚠️   Claude Code CLI not detected — skipping."); }
+
+  if (existsSync(cacheDir)) {
+    try { rmSync(cacheDir, { recursive: true, force: true }); console.log("✅  Removed token cache"); }
+    catch (e) { console.log(`⚠️   Could not remove token cache: ${(e as Error).message}`); }
+  } else {
+    console.log("ℹ️   No token cache found — skipping.");
+  }
+
+  console.log("\n======================================\n  Uninstall complete!\n======================================\n");
+  console.log("👉  Restart Claude Desktop / Claude Code to apply changes.\n");
 }

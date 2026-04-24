@@ -6,8 +6,10 @@ import { siteTools } from "./sites/index.js";
 import { listTools } from "./lists/index.js";
 import { sharingTools } from "./sharing/index.js";
 import { pageTools } from "./pages/index.js";
+import { authTools } from "./auth/index.js";
 
 export const ALL_TOOLS: ToolDef[] = [
+  ...authTools,
   ...driveTools,
   ...fileTools,
   ...siteTools,
