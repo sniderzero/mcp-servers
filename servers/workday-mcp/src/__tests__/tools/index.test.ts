@@ -16,11 +16,19 @@ const EXPECTED_TOOLS = [
   "workday_run_report",
   "workday_wql_query",
   "workday_wql_query_all",
+  // Security / HR tools
+  "workday_get_workers",
+  "workday_get_workday_account",
+  "workday_update_workday_account",
+  "workday_add_workday_account",
+  "workday_get_provisioning_groups",
+  "workday_get_provisioning_group_assignments",
+  "workday_put_provisioning_group_assignment",
 ];
 
 describe("TOOL_DEFINITIONS", () => {
-  it("has exactly 14 tool definitions", () => {
-    expect(TOOL_DEFINITIONS).toHaveLength(14);
+  it("has exactly 21 tool definitions", () => {
+    expect(TOOL_DEFINITIONS).toHaveLength(21);
   });
 
   it("contains all expected tool names", () => {

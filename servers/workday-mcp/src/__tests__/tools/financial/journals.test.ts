@@ -108,7 +108,12 @@ describe("handleGetPayments", () => {
       getPayments,
       expect.objectContaining({
         Request_Criteria: {
-          Payment_Date_Range: { Start_Date: "2026-01-01", End_Date: "2026-12-31" },
+          General_Payment_Criteria: [
+            {
+              Payment_Date_on_Date_Or_After: "2026-01-01",
+              Payment_Date_on_Date_Or_Before: "2026-12-31",
+            },
+          ],
         },
       }),
       "test-token",

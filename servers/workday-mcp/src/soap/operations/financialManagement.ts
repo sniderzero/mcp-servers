@@ -131,9 +131,15 @@ export const getPayments: SoapOperation<GetPaymentsRequest, GetPaymentsResponse>
       .optional(),
     Request_Criteria: z
       .object({
-        Payment_Date_On_or_After: z.string().optional(),
-        Payment_Date_On_or_Before: z.string().optional(),
-        Payee_Reference: wdRef.optional(),
+        General_Payment_Criteria: z
+          .array(
+            z.object({
+              Payment_Date_on_Date_Or_After: z.string().optional(),
+              Payment_Date_on_Date_Or_Before: z.string().optional(),
+              Payee_Reference: z.array(wdRef).optional(),
+            }),
+          )
+          .optional(),
       })
       .optional(),
   }),

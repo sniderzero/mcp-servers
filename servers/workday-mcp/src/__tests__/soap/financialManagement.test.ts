@@ -147,7 +147,7 @@ describe("getJournals", () => {
 
 describe("getAccountPostingRules", () => {
   it("has correct operation", () => {
-    expect(getAccountPostingRules.operation).toBe("Get_Account_Posting_Rules");
+    expect(getAccountPostingRules.operation).toBe("Get_Account_Posting_Rule_Sets");
   });
 
   it("validates empty request", () => {
@@ -162,7 +162,7 @@ describe("getAccountPostingRules", () => {
 
 describe("getFinancialInstitutions", () => {
   it("has correct operation", () => {
-    expect(getFinancialInstitutions.operation).toBe("Get_Financial_Institutions");
+    expect(getFinancialInstitutions.operation).toBe("Get_Banks");
   });
 
   it("validates empty request", () => {
@@ -178,7 +178,12 @@ describe("getPayments", () => {
   it("validates request with date range", () => {
     const result = getPayments.requestSchema.safeParse({
       Request_Criteria: {
-        Payment_Date_Range: { Start_Date: "2026-01-01", End_Date: "2026-12-31" },
+        General_Payment_Criteria: [
+          {
+            Payment_Date_on_Date_Or_After: "2026-01-01",
+            Payment_Date_on_Date_Or_Before: "2026-12-31",
+          },
+        ],
       },
     });
     expect(result.success).toBe(true);
@@ -187,7 +192,7 @@ describe("getPayments", () => {
   it("builds body with criteria", () => {
     const body = getPayments.buildBody({
       Request_Criteria: {
-        Payment_Date_On_or_After: "2026-01-01",
+        General_Payment_Criteria: [{ Payment_Date_on_Date_Or_After: "2026-01-01" }],
       },
     });
     expect(body["Request_Criteria"]).toBeDefined();

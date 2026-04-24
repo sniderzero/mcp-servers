@@ -88,25 +88,16 @@ describe("handleGetPostingRules", () => {
 });
 
 describe("handleGetFinancialInstitutions", () => {
-  it("calls soapCodec with getFinancialInstitutions operation", async () => {
+  it("throws not-implemented McpError", async () => {
     const ctx = createMockContext();
-    await handleGetFinancialInstitutions({}, ctx);
-    expect(ctx.soapCodec.execute).toHaveBeenCalledWith(
-      getFinancialInstitutions,
-      expect.any(Object),
-      "test-token",
+    await expect(handleGetFinancialInstitutions({}, ctx)).rejects.toThrow(
+      "workday_get_financial_institutions is not yet available",
     );
   });
 
-  it("passes pagination args", async () => {
+  it("does not call soapCodec", async () => {
     const ctx = createMockContext();
-    await handleGetFinancialInstitutions({ page: 3, count: 25 }, ctx);
-    expect(ctx.soapCodec.execute).toHaveBeenCalledWith(
-      getFinancialInstitutions,
-      expect.objectContaining({
-        Response_Filter: { Page: 3, Count: 25 },
-      }),
-      "test-token",
-    );
+    await handleGetFinancialInstitutions({}, ctx).catch(() => {});
+    expect(ctx.soapCodec.execute).not.toHaveBeenCalled();
   });
 });

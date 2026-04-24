@@ -139,9 +139,11 @@ export interface Payment extends WorkdayObject {
 
 export interface GetPaymentsRequest extends PagedRequest {
   Request_Criteria?: {
-    Payment_Date_On_or_After?: string;
-    Payment_Date_On_or_Before?: string;
-    Payee_Reference?: WorkdayReference;
+    General_Payment_Criteria?: Array<{
+      Payment_Date_on_Date_Or_After?: string;
+      Payment_Date_on_Date_Or_Before?: string;
+      Payee_Reference?: WorkdayReference[];
+    }>;
   };
 }
 

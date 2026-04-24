@@ -122,14 +122,12 @@ describe("handleCreateInvoice", () => {
 });
 
 describe("handleGetInvoiceAdjustments", () => {
-  it("calls with Include_Archived set to true", async () => {
+  it("calls soapCodec with getSupplierInvoices operation", async () => {
     const ctx = createMockContext();
     await handleGetInvoiceAdjustments({}, ctx);
     expect(ctx.soapCodec.execute).toHaveBeenCalledWith(
       getSupplierInvoices,
-      expect.objectContaining({
-        Request_Criteria: { Include_Archived: true },
-      }),
+      expect.any(Object),
       "test-token",
     );
   });

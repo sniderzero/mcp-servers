@@ -171,10 +171,17 @@ export async function handleGetPayments(
       getPayments,
       {
         Response_Filter: { Page: page, Count: count },
-        Request_Criteria: {
-          Payment_Date_On_or_After: start_date,
-          Payment_Date_On_or_Before: end_date,
-        },
+        Request_Criteria:
+          start_date ?? end_date
+            ? {
+                General_Payment_Criteria: [
+                  {
+                    Payment_Date_on_Date_Or_After: start_date,
+                    Payment_Date_on_Date_Or_Before: end_date,
+                  },
+                ],
+              }
+            : undefined,
       },
       token,
     );
