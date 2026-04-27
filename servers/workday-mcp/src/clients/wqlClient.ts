@@ -34,8 +34,17 @@ export class WqlClient extends WorkdayRestClient {
     token: string,
     params: Record<string, unknown> = {},
   ): Promise<WqlPageResult<T>> {
-    const body = { query, ...params };
-    const raw = await this.post<WqlResponse<T>>(this.wqlEndpoint, token, body);
+    // Workday WQL API: only `query` goes in the POST body;
+    // `limit` and `offset` are URL query parameters.
+    const { limit, offset, ...bodyParams } = params;
+    const urlParams = new URLSearchParams();
+    if (limit !== undefined) urlParams.set("limit", String(limit));
+    if (offset !== undefined) urlParams.set("offset", String(offset));
+    const url = urlParams.toString()
+      ? `${this.wqlEndpoint}?${urlParams.toString()}`
+      : this.wqlEndpoint;
+    const body = { query, ...bodyParams };
+    const raw = await this.post<WqlResponse<T>>(url, token, body);
     return {
       data: raw.data ?? [],
       total: raw.total ?? raw.data?.length ?? 0,

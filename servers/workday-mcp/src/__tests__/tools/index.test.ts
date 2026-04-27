@@ -2,6 +2,10 @@ import { describe, it, expect } from "vitest";
 import { TOOL_DEFINITIONS, getToolHandler } from "../../tools/index.js";
 
 const EXPECTED_TOOLS = [
+  // Auth tools
+  "workday_auth_status",
+  "workday_auth_login",
+  // Financial tools
   "workday_get_business_units",
   "workday_get_posting_rules",
   "workday_get_financial_institutions",
@@ -27,8 +31,8 @@ const EXPECTED_TOOLS = [
 ];
 
 describe("TOOL_DEFINITIONS", () => {
-  it("has exactly 21 tool definitions", () => {
-    expect(TOOL_DEFINITIONS).toHaveLength(21);
+  it("has exactly 23 tool definitions", () => {
+    expect(TOOL_DEFINITIONS).toHaveLength(23);
   });
 
   it("contains all expected tool names", () => {
