@@ -29,7 +29,7 @@ export interface SupplierInvoice extends WorkdayObject {
   Payment_Terms_Reference?: WorkdayReference;
   Memo?: string;
   Approval_Status?: string;
-  Invoice_Lines?: SupplierInvoiceLine[];
+  Invoice_Line_Replacement_Data?: SupplierInvoiceLine[];
 }
 
 export interface SupplierInvoiceLine {
@@ -59,7 +59,7 @@ export interface SubmitSupplierInvoiceRequest {
     Invoice_Date: string;
     Supplier_Reference: WorkdayReference;
     Currency_Reference: WorkdayReference;
-    Invoice_Lines: SupplierInvoiceLine[];
+    Invoice_Line_Replacement_Data: SupplierInvoiceLine[];
     Memo?: string;
   };
 }

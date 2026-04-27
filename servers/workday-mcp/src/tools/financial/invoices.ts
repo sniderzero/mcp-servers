@@ -140,7 +140,7 @@ export async function handleCreateInvoice(
             ID: [{ $value:currency_code, attributes: { "wd:type": "Currency_ID" } }],
           },
           Memo: memo,
-          Invoice_Lines: lines.map((l, i) => ({
+          Invoice_Line_Replacement_Data: lines.map((l, i) => ({
             Line_Number: i + 1,
             Item_Description: l.description,
             Quantity: l.quantity,

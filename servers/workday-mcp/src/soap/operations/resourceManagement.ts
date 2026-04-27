@@ -75,7 +75,7 @@ export const submitSupplierInvoice: SoapOperation<
       Invoice_Date: z.string(),
       Supplier_Reference: wdRef,
       Currency_Reference: wdRef,
-      Invoice_Lines: z.array(z.record(z.unknown())),
+      Invoice_Line_Replacement_Data: z.array(z.record(z.unknown())),
       Memo: z.string().optional(),
     }),
   }),

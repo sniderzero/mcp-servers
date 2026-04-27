@@ -93,7 +93,7 @@ describe("submitSupplierInvoice", () => {
         Invoice_Date: "2026-01-01",
         Supplier_Reference: { ID: [{ $value:"SUP-1", attributes: { "wd:type": "Supplier_ID" } }] },
         Currency_Reference: { ID: [{ $value:"USD", attributes: { "wd:type": "Currency_ID" } }] },
-        Invoice_Lines: [{ Line_Number: 1 }],
+        Invoice_Line_Replacement_Data: [{ Line_Number: 1 }],
       },
     });
     expect(result.success).toBe(true);
@@ -106,7 +106,7 @@ describe("submitSupplierInvoice", () => {
         Invoice_Date: "2026-01-01",
         Supplier_Reference: { ID: [] },
         Currency_Reference: { ID: [] },
-        Invoice_Lines: [],
+        Invoice_Line_Replacement_Data: [],
       },
     };
     const body = submitSupplierInvoice.buildBody(data);

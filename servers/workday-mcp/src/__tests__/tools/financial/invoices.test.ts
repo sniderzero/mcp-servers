@@ -115,7 +115,7 @@ describe("handleCreateInvoice", () => {
       ctx,
     );
     const call = (ctx.soapCodec.execute as any).mock.calls[0];
-    const lines = call[1].Supplier_Invoice_Data.Invoice_Lines;
+    const lines = call[1].Supplier_Invoice_Data.Invoice_Line_Replacement_Data;
     expect(lines[0].Line_Number).toBe(1);
     expect(lines[1].Line_Number).toBe(2);
   });
